@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — Figure 1</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+
+  header {
+    background: #042C53;
+    color: #fff;
+    padding: 28px 40px 20px;
+  }
+  header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  header p  { font-size: 13px; color: #85B7EB; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
+
+  .controls {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+  }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 9px 18px; font-size: 13px; border-radius: 7px;
+    border: 1px solid #bbb; cursor: pointer;
+    background: #fff; color: #555; transition: all 0.15s;
+    font-family: inherit; min-height: 40px;
+  }
+  .tab-btn.active { background: #042C53; color: #fff; border-color: #042C53; }
+  .tab-btn:hover:not(.active) { background: #eef2f7; }
+
+  .sort-btn {
+    padding: 9px 16px; font-size: 12px; border-radius: 7px;
+    border: 1px solid #ccc; cursor: pointer; background: #fff;
+    color: #555; font-family: inherit; transition: all 0.15s; min-height: 40px;
+  }
+  .sort-btn:hover { background: #eef2f7; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    margin-bottom: 16px; font-size: 13px; color: #555;
+  }
+  .legend span { display: flex; align-items: center; gap: 7px; }
+  .legend-swatch { width: 13px; height: 13px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+
+  .chart-card {
+    background: #fff; border-radius: 12px;
+    border: 1px solid #e0e5ec;
+    padding: 24px 28px 18px;
+  }
+  .chart-subtitle {
+    font-size: 12px; color: #888; margin-bottom: 18px;
+  }
+
+  .bar-row {
+    display: flex; align-items: center;
+    margin-bottom: 5px; position: relative;
+  }
+  .bar-row:nth-child(even) { background: #f8f9fb; border-radius: 4px; }
+
+  .item-id {
+    width: 58px; text-align: right; padding-right: 10px;
+    font-size: 11px; font-weight: 700; color: #333;
+    flex-shrink: 0;
+  }
+  .bar-wrap { position: relative;
+    flex: 1; display: flex; height: 28px;
+    border-radius: 3px; overflow: hidden; cursor: default;
+  }
+  .seg {
+    display: flex; align-items: center; justify-content: center;
+    transition: filter 0.12s;
+    position: relative;
+  }
+  .seg:hover { filter: brightness(1.12); }
+  .seg-label {
+    font-size: 10px; color: #fff; pointer-events: none;
+    white-space: nowrap;
+  }
+  .easy-pct {
+    width: 42px; text-align: right; padding-left: 8px;
+    font-size: 11px; font-weight: 700; color: #185FA5;
+    flex-shrink: 0;
+  }
+  .axis-row {
+    display: flex; align-items: flex-start; margin-top: 4px;
+  }
+  .axis-spacer { width: 58px; flex-shrink: 0; }
+  .axis-ticks {
+    flex: 1; display: flex; justify-content: space-between;
+    font-size: 10px; color: #bbb; padding: 2px 0;
+  }
+  .easy-hdr {
+    width: 42px; text-align: right; padding-left: 8px;
+    font-size: 9px; color: #aaa;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    z-index: 1000;
+  }
+  .seg { cursor: pointer; -webkit-tap-highlight-color: rgba(255,255,255,0.2); }
+  .tab-btn, .sort-btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+  footer {
+    text-align: center;
+    font-size: 11px; color: #aaa;
+    padding: 20px 0 30px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 20px; }
+    .container { padding: 16px; }
+    .chart-card { padding: 16px 12px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HLS<sub>19</sub> Health Literacy Instruments — Greek Versions</h1>
+  <p>Item-level response distributions &middot; Figure 1 &middot; Flokou et al., <em>Healthcare</em> 2025 &middot; N = 71</p>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" onclick="setScale('NAV')">HLS19-NAV-GR</button>
+      <button class="tab-btn" onclick="setScale('COM')">HLS19-COM-GR</button>
+      <button class="tab-btn" onclick="setScale('VAC')">HLS19-VAC-GR</button>
+      <button class="tab-btn" onclick="setScale('APRP')">APRP means</button>
+    </div>
+    <button class="sort-btn" id="sort-btn" onclick="toggleSort()">Sort: Easy% &darr;</button>
+  </div>
+
+  <div class="legend">
+    <span><span class="legend-swatch" style="background:#A32D2D"></span>Very difficult</span>
+    <span><span class="legend-swatch" style="background:#EF9F27"></span>Difficult</span>
+    <span><span class="legend-swatch" style="background:#85B7EB"></span>Easy</span>
+    <span><span class="legend-swatch" style="background:#185FA5"></span>Very easy</span>
+    <span style="margin-left:auto;color:#185FA5;font-weight:600;font-size:12px;">Bold % = Easy + Very easy</span>
+  </div>
+
+  <div class="chart-card">
+    <p class="chart-subtitle" id="subtitle"></p>
+    <div id="chart"></div>
+    <div class="axis-row">
+      <div class="axis-spacer"></div>
+      <div class="axis-ticks">
+        <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+      </div>
+      <div class="easy-hdr">Easy+</div>
+    </div>
+  </div>
+</div>
+
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025)</footer>
+
+<div id="tooltip"></div>
+
+<script>
+var COLORS = ['#A32D2D','#EF9F27','#85B7EB','#185FA5'];
+var CAT = ['Very difficult','Difficult','Easy','Very easy'];
+
+var SCALES = {
+  NAV: {
+    subtitle: 'HLS19-NAV-GR — Navigational Health Literacy &middot; "How easy is it to…"',
+    items: ['NAV1','NAV2','NAV3','NAV4','NAV5','NAV6','NAV7','NAV8','NAV9','NAV10','NAV11','NAV12'],
+    vals: {
+      NAV1:[4.2,35.2,45.1,15.5], NAV2:[2.8,33.8,52.1,11.3], NAV3:[8.5,45.0,32.4,14.1],
+      NAV4:[15.5,52.1,22.5,9.9], NAV5:[9.9,54.9,23.9,11.3], NAV6:[7.0,43.7,33.8,15.5],
+      NAV7:[11.3,45.0,32.4,11.3], NAV8:[8.5,36.6,35.2,19.7], NAV9:[7.0,25.4,49.3,18.3],
+      NAV10:[7.0,46.5,36.6,9.9], NAV11:[8.5,38.0,43.6,9.9], NAV12:[23.9,35.2,28.2,12.7]
+    },
+    desc: {
+      NAV1:'Understand how the health care system works',
+      NAV2:'Judge which type of health service you need',
+      NAV3:'Judge if insurance covers a health service',
+      NAV4:'Understand info on ongoing health care reforms',
+      NAV5:'Find out about your rights as a patient',
+      NAV6:'Decide for a particular health service',
+      NAV7:'Find information on quality of a health service',
+      NAV8:'Judge if a service meets your expectations',
+      NAV9:'Understand how to get an appointment',
+      NAV10:'Find out about support options in the system',
+      NAV11:'Locate the right contact person in a health institution',
+      NAV12:'Stand up for yourself if care does not meet needs'
+    }
+  },
+  COM: {
+    subtitle: 'HLS19-COM-GR — Communicative Health Literacy &middot; "How easy is it to…"',
+    items: ['COM1','COM2','COM3','COM4','COM5','COM6','COM7','COM8','COM9','COM10','COM11'],
+    vals: {
+      COM1:[0.0,9.9,47.8,42.3], COM2:[2.8,25.4,57.7,14.1], COM3:[0.0,21.1,55.0,23.9],
+      COM4:[7.0,52.1,32.4,8.5], COM5:[4.2,32.4,49.3,14.1], COM6:[1.4,19.7,63.4,15.5],
+      COM7:[4.2,19.7,50.7,25.4], COM8:[0.0,16.9,59.2,23.9], COM9:[2.8,35.2,46.5,15.5],
+      COM10:[4.2,26.8,50.7,18.3], COM11:[2.9,11.4,58.6,27.1]
+    },
+    desc: {
+      COM1:'Describe your reasons for the consultation',
+      COM2:'Make your doctor listen without being interrupted',
+      COM3:'Explain your health concerns to your doctor',
+      COM4:'Get enough time in the consultation',
+      COM5:'Express your personal views and preferences',
+      COM6:'Get the information you need from your doctor',
+      COM7:'Understand the words used by your doctor',
+      COM8:'Ask your doctor questions in the consultation',
+      COM9:'Be involved in decisions about your health',
+      COM10:'Recall the information you get from your doctor',
+      COM11:'Use the information from your doctor for your health'
+    }
+  },
+  VAC: {
+    subtitle: 'HLS19-VAC-GR — Vaccination Health Literacy &middot; "How easy is it to…"',
+    items: ['VAC1','VAC2','VAC3','VAC4'],
+    vals: {
+      VAC1:[1.4,26.8,47.9,23.9], VAC2:[0.0,14.1,54.9,31.0],
+      VAC3:[0.0,23.9,45.1,31.0], VAC4:[1.4,18.3,39.4,40.9]
+    },
+    desc: {
+      VAC1:'Find information on recommended vaccinations',
+      VAC2:'Understand why you/family may need vaccinations',
+      VAC3:'Judge which vaccinations you/family may need',
+      VAC4:'Decide if you should have a flu vaccination'
+    }
+  },
+  APRP: {
+    subtitle: 'Average Percentage Response Pattern (APRP) &middot; Scale-level means',
+    items: ['VAC','COM','NAV'],
+    vals: { VAC:[1,21,46,32], COM:[3,25,51,21], NAV:[10,41,36,13] },
+    desc: {
+      VAC:'HLS19-VAC-GR — Vaccination HL scale mean',
+      COM:'HLS19-COM-GR — Communicative HL scale mean',
+      NAV:'HLS19-NAV-GR — Navigational HL scale mean'
+    }
+  }
+};
+
+var currentScale = 'NAV';
+var sortByEasy = true;
+
+function setScale(s) {
+  currentScale = s;
+  document.querySelectorAll('.tab-btn').forEach(function(b,i) {
+    b.classList.toggle('active', ['NAV','COM','VAC','APRP'][i] === s);
+  });
+  render();
+}
+
+function toggleSort() {
+  sortByEasy = !sortByEasy;
+  document.getElementById('sort-btn').innerHTML = sortByEasy ? 'Sort: Easy% &darr;' : 'Sort: Original order';
+  render();
+}
+
+var tip = document.getElementById('tooltip');
+
+function showTip(e, item, ci, pct, easy, desc) {
+  tip.style.opacity = '1';
+  tip.innerHTML = '<strong>' + item + '</strong><br>'
+    + '<span style="color:#888;font-size:11px;">' + desc + '</span><br><br>'
+    + '<span style="color:' + COLORS[ci] + ';font-weight:600;">' + CAT[ci] + ': ' + pct.toFixed(1) + '%</span><br>'
+    + '<span style="color:#185FA5;font-size:11px;">Easy + Very easy: ' + easy.toFixed(1) + '%</span>';
+  moveTip(e);
+}
+
+function moveTip(e) {
+  var tx = e.clientX + 14, ty = e.clientY - 10;
+  if (tx + 250 > window.innerWidth) tx = e.clientX - 255;
+  if (ty + 100 > window.innerHeight) ty = e.clientY - 100;
+  tip.style.left = tx + 'px';
+  tip.style.top  = ty + 'px';
+}
+
+function hideTip() { tip.style.opacity = '0'; }
+
+function tapTip(e, item, ci, pct, easy, desc) {
+  e.preventDefault();
+  e.stopPropagation();
+  var touch = e.touches[0];
+  if (tip.style.opacity === '1') { hideTip(); return; }
+  tip.style.opacity = '1';
+  tip.innerHTML = '<strong>' + item + '</strong><br>'
+    + '<span style="color:#888;font-size:11px;">' + desc + '</span><br><br>'
+    + '<span style="color:' + COLORS[ci] + ';font-weight:600;">' + CAT[ci] + ': ' + pct.toFixed(1) + '%</span><br>'
+    + '<span style="color:#185FA5;font-size:11px;">Easy + Very easy: ' + easy.toFixed(1) + '%</span>';
+  var tx = touch.clientX + 14, ty = touch.clientY - 80;
+  if (tx + 260 > window.innerWidth) tx = touch.clientX - 265;
+  if (ty < 10) ty = touch.clientY + 20;
+  tip.style.left = tx + 'px';
+  tip.style.top  = ty + 'px';
+}
+
+document.addEventListener('touchstart', function(e) {
+  if (!e.target.closest('.seg')) hideTip();
+}, { passive: true });
+
+function render() {
+  var sc = SCALES[currentScale];
+  document.getElementById('subtitle').innerHTML = sc.subtitle;
+
+  var indices = sc.items.map(function(_,i){ return i; });
+  if (sortByEasy) {
+    indices.sort(function(a,b) {
+      var ea = sc.vals[sc.items[a]][2] + sc.vals[sc.items[a]][3];
+      var eb = sc.vals[sc.items[b]][2] + sc.vals[sc.items[b]][3];
+      return eb - ea;
+    });
+  }
+
+  var html = '';
+  indices.forEach(function(origIdx, row) {
+    var item = sc.items[origIdx];
+    var v    = sc.vals[item];
+    var desc = sc.desc[item] || '';
+    var easy = v[2] + v[3];
+
+    html += '<div class="bar-row" onmouseleave="hideTip()">';
+    html += '<div class="item-id">' + item + '</div>';
+    html += '<div class="bar-wrap">';
+    v.forEach(function(pct, ci) {
+      if (pct < 0.2) return;
+      html += '<div class="seg" style="width:' + pct + '%;background:' + COLORS[ci] + ';"'
+        + ' onmouseenter="showTip(event,\'' + item + '\',' + ci + ',' + pct + ',' + easy + ',\'' + desc.replace(/'/g,"&#39;") + '\')"'
+        + ' onmousemove="moveTip(event)"'
+        + ' ontouchstart="tapTip(event,\'' + item + '\',' + ci + ',' + pct + ',' + easy + ',\'' + desc.replace(/'/g,"&#39;") + '\')"'
+        + '>';
+      if (pct >= 2.5) {
+        html += '<span class="seg-label">' + Math.round(pct) + '%</span>';
+      } else if (pct >= 0.5) {
+        html += '<span style="position:absolute;margin-left:2px;font-size:9px;color:#fff;font-weight:700;pointer-events:none;line-height:28px;">' + pct.toFixed(1) + '%</span>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="easy-pct">' + Math.round(easy) + '%</div>';
+    html += '</div>';
+  });
+
+  document.getElementById('chart').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
