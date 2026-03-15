@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — Table S7</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+
+  header { background: #042C53; color: #fff; padding: 28px 40px 20px; }
+  header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  header p  { font-size: 13px; color: #85B7EB; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 28px 32px; }
+
+  .explanation {
+    background: #fff; border: 1px solid #e0e5ec; border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 24px; line-height: 1.75; font-size: 13px; color: #444;
+  }
+  .explanation h2 { font-size: 15px; font-weight: 600; color: #042C53; margin-bottom: 10px; }
+  .explanation p  { margin-bottom: 8px; }
+  .explanation p:last-child { margin-bottom: 0; }
+  .pill {
+    display: inline-block; padding: 2px 9px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; vertical-align: middle; margin: 0 2px;
+  }
+
+  .chart-card {
+    background: #fff; border: 1px solid #e0e5ec; border-radius: 12px;
+    padding: 24px 28px 20px;
+  }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .fb {
+    padding: 7px 16px; font-size: 12px; border-radius: 6px;
+    border: 1px solid #ccc; cursor: pointer; background: #fff;
+    color: #555; font-family: inherit; touch-action: manipulation; min-height: 36px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .fb.active-all    { background: #042C53; color: #fff; border-color: #042C53; }
+  .fb.active-higher { background: rgba(76,175,80,0.2);  color: #2E7D32; border-color: #4CAF50; font-weight: 600; }
+  .fb.active-none   { background: rgba(255,193,7,0.3);  color: #7B4F00; border-color: #FFC107; font-weight: 600; }
+  .fb.active-lower  { background: rgba(255,112,67,0.2); color: #BF360C; border-color: #FF7043; font-weight: 600; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12px; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .ls { width: 13px; height: 13px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  th, td { text-align: center; padding: 0; border: 1px solid #e8eaf0; }
+  th { background: #f4f7fb; color: #555; font-weight: 600; font-size: 11px; padding: 7px 4px; }
+  th.rhdr { text-align: right; padding-right: 10px; font-size: 11px; color: #444; background: #f9fafb; min-width: 64px; }
+  td.rhdr { text-align: right; padding: 6px 10px 6px 6px; font-weight: 600; font-size: 12px; color: #333; background: #f9fafb; border-right: 2px solid #dde3ec; }
+  td.rhdr.row-hl { background: #d0ddf5; font-weight: 700; }
+  td.cell { min-width: 46px; height: 38px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; position: relative; padding: 0; }
+  td.cell canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  td.cell span.lbl { position: relative; z-index: 2; pointer-events: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 38px; }
+  td.cell.empty { background: #fafafa; pointer-events: none; }
+  td.cell.dimmed { opacity: 0.07; }
+  td.tcol { background: #f0f4fa; font-weight: 700; color: #042C53; padding: 6px 8px; border-left: 2px solid #dde3ec; }
+  td.tcol.hl { background: #b8cef0; font-weight: 800; }
+  tr.trow td { background: #f0f4fa; font-weight: 700; color: #042C53; padding: 7px 4px; font-size: 11px; }
+  tr.trow td.hl { background: #b8cef0; }
+  tr.trrow td { padding: 6px 4px; font-size: 11px; font-weight: 600; }
+  tr.trrow td.rhdr { font-size: 10px; color: #666; white-space: nowrap; }
+
+  .note { font-size: 11px; color: #aaa; margin-top: 12px; line-height: 1.6; }
+
+  #tip {
+    position: fixed; background: #fff; border: 1px solid #dde3ec; border-radius: 8px;
+    padding: 9px 13px; font-size: 12px; line-height: 1.7; pointer-events: none;
+    opacity: 0; transition: opacity 0.1s; max-width: 230px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 200; color: #333;
+  }
+
+  footer { text-align: center; font-size: 11px; color: #aaa; padding: 20px 0 30px; }
+
+  @media (max-width: 600px) {
+    header { padding: 20px; }
+    .container { padding: 16px; }
+    .chart-card { padding: 16px 12px; }
+    .explanation { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HLS<sub>19</sub> Health Literacy Instruments — Greek Versions</h1>
+  <p>Score transitions: P-type → D-type coding &middot; Table S7 &middot; Flokou et al., <em>Healthcare</em> 2025 &middot; HLS19-VAC-GR</p>
+</header>
+
+<div class="container">
+
+  <div class="explanation">
+    <h2>What does this table show?</h2>
+    <p>The HLS19-VAC-GR instrument uses 4 items, each rated on a 4-point scale (1 = Very Difficult … 4 = Very Easy). There are 4⁴ = <strong>256 possible response patterns</strong>. Each pattern produces two scores:</p>
+    <p><strong>P-type</strong> (polytomous): the mean of the 4 ratings, rescaled to 0–100. It has 13 distinct values (0, 8.3, 16.7 … 100).</p>
+    <p><strong>D-type</strong> (dichotomous): responses 1–2 are recoded as 0 (difficult), responses 3–4 as 1 (easy); the percentage of "easy" responses gives a score with only 5 possible values (0, 25, 50, 75, 100).</p>
+    <p>Each cell shows how many patterns share a given P-type / D-type combination. Color reveals the <strong>direction of change</strong> caused by dichotomization:
+      <span class="pill" style="background:rgba(76,175,80,0.2);color:#2E7D32;border:1px solid #4CAF50;">Higher</span> the D-type score exceeds the P-type score &nbsp;·&nbsp;
+      <span class="pill" style="background:rgba(255,193,7,0.28);color:#7B4F00;border:1px solid #FFC107;">No change</span> scores are equal &nbsp;·&nbsp;
+      <span class="pill" style="background:rgba(255,112,67,0.2);color:#BF360C;border:1px solid #FF7043;">Lower</span> the D-type score is below the P-type score.
+    </p>
+    <p>By design, the Higher and Lower groups are perfectly symmetric (93 patterns each), while 70 patterns remain unchanged. This illustrates the <strong>information compression</strong> and many-to-one mapping induced by dichotomization — particularly relevant for HLS19-VAC-GR, which already shows a ceiling effect.</p>
+  </div>
+
+  <div class="chart-card">
+    <div class="legend">
+      <span><span class="ls" style="background:rgba(76,175,80,0.55)"></span>Higher D-type</span>
+      <span><span class="ls" style="background:rgba(255,193,7,0.75)"></span>No change</span>
+      <span><span class="ls" style="background:rgba(255,112,67,0.55)"></span>Lower D-type</span>
+      <span><span class="ls" style="background:#fafafa;border:1px solid #eee"></span>Impossible pattern</span>
+    </div>
+
+    <div class="filter-row">
+      <button id="fb-all"    class="fb active-all" onclick="setFilter('all')">All patterns</button>
+      <button id="fb-higher" class="fb"            onclick="setFilter('higher')">Higher D-type only</button>
+      <button id="fb-none"   class="fb"            onclick="setFilter('none')">No change only</button>
+      <button id="fb-lower"  class="fb"            onclick="setFilter('lower')">Lower D-type only</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th class="rhdr" rowspan="2" style="vertical-align:bottom;">P-type<br>score</th>
+          <th colspan="5" style="border-bottom:2px solid #dde3ec;padding:8px 4px;color:#042C53;">D-type score</th>
+          <th rowspan="2" style="vertical-align:bottom;background:#f0f4fa;color:#042C53;padding:6px 8px;border-left:2px solid #dde3ec;">Row<br>total</th>
+        </tr>
+        <tr id="col-hdrs"></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    </div>
+
+    <p class="note">Click or tap any cell to highlight its row (P-type) and column (D-type) with a dot pattern. Use the filter buttons above to isolate one transition type. Hover or tap for details.</p>
+  </div>
+
+</div>
+
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025)</footer>
+<div id="tip"></div>
+
+<script>
+var DCOLS=[0,25,50,75,100];
+var ROWS=[
+  {p:100.0,d:{100:1},             total:1 },
+  {p:91.7, d:{100:4},             total:4 },
+  {p:83.3, d:{75:4,100:6},        total:10},
+  {p:75.0, d:{75:16,100:4},       total:20},
+  {p:66.7, d:{50:6,75:24,100:1},  total:31},
+  {p:58.3, d:{50:24,75:16},       total:40},
+  {p:50.0, d:{25:4,50:36,75:4},   total:44},
+  {p:41.7, d:{25:16,50:24},       total:40},
+  {p:33.3, d:{0:1,25:24,50:6},    total:31},
+  {p:25.0, d:{0:4,25:16},         total:20},
+  {p:16.7, d:{0:6,25:4},          total:10},
+  {p:8.3,  d:{0:4},               total:4 },
+  {p:0.0,  d:{0:1},               total:1 }
+];
+var COL_TOTALS=[16,64,96,64,16];
+var T={higher:{vals:[0,4,30,44,15],total:93},none:{vals:[1,16,36,16,1],total:70},lower:{vals:[15,44,30,4,0],total:93}};
+var TS={
+  higher:{bg:'rgba(76,175,80,0.18)', dotC:'rgba(46,125,50,0.55)',  txt:'#2E7D32', bdr:'rgba(76,175,80,0.5)',  lbl:'Higher D-type'},
+  none:  {bg:'rgba(255,193,7,0.25)', dotC:'rgba(123,79,0,0.45)',   txt:'#7B4F00', bdr:'rgba(255,193,7,0.7)',  lbl:'No change'},
+  lower: {bg:'rgba(255,112,67,0.18)',dotC:'rgba(191,54,12,0.55)',  txt:'#BF360C', bdr:'rgba(255,112,67,0.5)', lbl:'Lower D-type'}
+};
+function getType(p,d){if(d>p)return 'higher';if(d<p)return 'lower';return 'none';}
+var activeFilter='all',activeRow=-1,activeCol=-1;
+
+function drawDots(canvas,color){
+  var w=canvas.offsetWidth||46,h=canvas.offsetHeight||38;
+  canvas.width=w;canvas.height=h;
+  var ctx=canvas.getContext('2d'),sp=6,r=1.8;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle=color;
+  for(var x=sp/2;x<w;x+=sp)for(var y=sp/2;y<h;y+=sp){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+}
+function clearDots(cv){if(cv){var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);}}
+
+var tip=document.getElementById('tip');
+function showTip(ex,ey,p,d,count,type){
+  var s=TS[type];
+  tip.style.opacity='1';
+  tip.innerHTML='<strong>P-type = '+p.toFixed(1)+' &rarr; D-type = '+d+'</strong><br>Patterns: <strong>'+count+'</strong><br><span style="color:'+s.txt+';font-weight:600;">'+s.lbl+'</span>';
+  var tx=ex+14,ty=ey-10;
+  if(tx+240>window.innerWidth)tx=ex-240;
+  if(ty<10)ty=ey+20;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function hideTip(){tip.style.opacity='0';}
+
+function setFilter(f){
+  activeFilter=f;
+  ['all','higher','none','lower'].forEach(function(k){document.getElementById('fb-'+k).className='fb'+(k===f?' active-'+k:'');});
+  updateDisplay();
+}
+function setHL(ri,ci){
+  if(activeRow===ri&&activeCol===ci){activeRow=-1;activeCol=-1;}else{activeRow=ri;activeCol=ci;}
+  updateDisplay();
+}
+function updateDisplay(){
+  ROWS.forEach(function(row,ri){
+    var isRowHL=(activeRow===ri);
+    document.getElementById('rh-'+ri).className='rhdr'+(isRowHL?' row-hl':'');
+    DCOLS.forEach(function(d,ci){
+      var td=document.getElementById('c-'+ri+'-'+ci);if(!td)return;
+      var count=row.d[d]||0;if(!count)return;
+      var type=getType(row.p,d),s=TS[type],hl=isRowHL||(activeCol===ci),dimmed=(activeFilter!=='all'&&type!==activeFilter);
+      td.style.background=s.bg;td.style.borderColor=s.bdr;td.style.color=hl?'#111':s.txt;
+      td.className='cell'+(dimmed?' dimmed':'');
+      var cv=td.querySelector('canvas');
+      if(hl&&!dimmed){
+        if(!cv){cv=document.createElement('canvas');td.insertBefore(cv,td.firstChild);}
+        (function(c,dc){requestAnimationFrame(function(){drawDots(c,dc);});})(cv,s.dotC);
+      } else {clearDots(cv);}
+    });
+    var rt=document.getElementById('rt-'+ri);if(rt)rt.className='tcol'+(isRowHL?' hl':'');
+  });
+  DCOLS.forEach(function(d,ci){
+    var th=document.getElementById('ch-'+d);if(th)th.style.background=(activeCol===ci)?'#d0ddf5':'#f4f7fb';
+    var ct=document.getElementById('ct-'+ci);if(ct)ct.className=(activeCol===ci)?'hl':'';
+  });
+  ['higher','none','lower'].forEach(function(t){
+    DCOLS.forEach(function(_,ci){
+      var td=document.getElementById('tr-'+t+'-'+ci);if(!td)return;
+      td.style.opacity=(activeFilter!=='all'&&activeFilter!==t)?'0.1':'1';
+      td.style.background=(activeCol===ci)?TS[t].dotC.replace('0.55','0.25').replace('0.45','0.2'):(parseInt(td.dataset.v)>0?TS[t].bg:'#fafafa');
+    });
+  });
+}
+
+// Build headers
+var colHdrRow=document.getElementById('col-hdrs');
+DCOLS.forEach(function(d){var th=document.createElement('th');th.id='ch-'+d;th.textContent=d;th.style.cssText='font-size:12px;font-weight:700;color:#042C53;border-bottom:2px solid #dde3ec;';colHdrRow.appendChild(th);});
+
+// Build rows
+var tbody=document.getElementById('tbody');
+ROWS.forEach(function(row,ri){
+  var tr=document.createElement('tr');
+  var rh=document.createElement('td');rh.className='rhdr';rh.id='rh-'+ri;rh.textContent=row.p.toFixed(1);tr.appendChild(rh);
+  DCOLS.forEach(function(d,ci){
+    var count=row.d[d]||0,td=document.createElement('td');td.id='c-'+ri+'-'+ci;
+    if(!count){td.className='cell empty';}
+    else{
+      var type=getType(row.p,d),s=TS[type];
+      td.className='cell';td.style.background=s.bg;td.style.borderColor=s.bdr;td.style.color=s.txt;
+      var lbl=document.createElement('span');lbl.className='lbl';lbl.textContent=count;td.appendChild(lbl);
+      td.addEventListener('click',function(){setHL(ri,ci);});
+      td.addEventListener('mouseenter',function(e){showTip(e.clientX,e.clientY,row.p,d,count,type);});
+      td.addEventListener('mousemove',function(e){var tx=e.clientX+14,ty=e.clientY-10;if(tx+240>window.innerWidth)tx=e.clientX-240;tip.style.left=tx+'px';tip.style.top=ty+'px';});
+      td.addEventListener('mouseleave',hideTip);
+      td.addEventListener('touchstart',function(e){e.preventDefault();setHL(ri,ci);var t=e.touches[0];if(tip.style.opacity==='1'){hideTip();return;}showTip(t.clientX,t.clientY,row.p,d,count,type);},{passive:false});
+    }
+    tr.appendChild(td);
+  });
+  var rt=document.createElement('td');rt.className='tcol';rt.id='rt-'+ri;rt.style.borderLeft='2px solid #dde3ec';rt.textContent=row.total;tr.appendChild(rt);
+  tbody.appendChild(tr);
+});
+
+// Separator
+var sep=document.createElement('tr');var sd=document.createElement('td');sd.colSpan=7;sd.style.cssText='height:5px;background:#f0f4fa;border-top:2px solid #dde3ec;';sep.appendChild(sd);tbody.appendChild(sep);
+
+// Col totals
+var totTr=document.createElement('tr');totTr.className='trow';
+var ct0=document.createElement('td');ct0.className='rhdr';ct0.style.fontSize='10px';ct0.textContent='Col. total';totTr.appendChild(ct0);
+COL_TOTALS.forEach(function(v,ci){var td=document.createElement('td');td.id='ct-'+ci;td.textContent=v;totTr.appendChild(td);});
+var gt=document.createElement('td');gt.className='tcol';gt.style.borderLeft='2px solid #dde3ec';gt.textContent='256';totTr.appendChild(gt);
+tbody.appendChild(totTr);
+
+// Transition rows
+[['higher','Higher D-type',T.higher],['none','No change',T.none],['lower','Lower D-type',T.lower]].forEach(function(arr){
+  var key=arr[0],lbl=arr[1],data=arr[2],tr=document.createElement('tr');tr.className='trrow';
+  var hdr=document.createElement('td');hdr.className='rhdr';hdr.style.fontSize='10px';hdr.style.color=TS[key].txt;hdr.textContent=lbl;tr.appendChild(hdr);
+  data.vals.forEach(function(v,ci){var td=document.createElement('td');td.id='tr-'+key+'-'+ci;td.dataset.v=v;td.textContent=v>0?v:'—';td.style.background=v>0?TS[key].bg:'#fafafa';td.style.color=v>0?TS[key].txt:'#ddd';td.style.padding='6px 4px';tr.appendChild(td);});
+  var tt=document.createElement('td');tt.className='tcol';tt.style.borderLeft='2px solid #dde3ec';tt.style.color=TS[key].txt;tt.textContent=data.total;tr.appendChild(tt);
+  tbody.appendChild(tr);
+});
+
+document.addEventListener('touchstart',function(e){if(!e.target.closest('.cell'))hideTip();},{passive:true});
+</script>
+</body>
+</html>
