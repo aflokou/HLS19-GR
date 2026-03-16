@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — P-type to D-type Transition (NAV)</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+header { background: #042C53; color: #fff; padding: 28px 40px 20px; }
+header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+header p  { font-size: 13px; color: #B5D4F4; }
+.container { max-width: 1000px; margin: 0 auto; padding: 28px 32px; }
+.expl { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px; font-size: 13px; color: #444; line-height: 1.75; }
+.expl h2 { font-size: 15px; font-weight: 600; color: #042C53; margin-bottom: 10px; }
+.expl p { margin-bottom: 8px; }
+.expl p:last-child { margin-bottom: 0; }
+.pill-inline { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:600; vertical-align:middle; margin:0 2px; }
+.card { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; padding: 24px 28px 20px; }
+footer { text-align: center; font-size: 11px; color: #aaa; padding: 20px 0 30px; }
+@media (max-width: 600px) { header { padding: 20px; } .container { padding: 16px; } .card { padding: 16px 14px; } .expl { padding: 16px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HLS<sub>19</sub> Greek Versions &mdash; P-type &rarr; D-type Score Transition</h1>
+  <p>HLS19-NAV-GR &middot; 12-item scale &middot; 4<sup>12</sup> = 16,777,216 theoretical response patterns &middot; Flokou et al., <em>Healthcare</em> 2025</p>
+</header>
+
+<div class="container">
+
+  <div class="expl">
+    <h2>What does this chart show?</h2>
+    <p>The HLS19-NAV-GR instrument has <strong>12 items</strong>, each rated 1–4. There are 4<sup>12</sup> = 16,777,216 possible response patterns. Each pattern yields two scores:</p>
+    <p><strong>P-type</strong> (polytomous): mean of the 12 ratings, rescaled to 0–100. Takes 37 distinct values.</p>
+    <p><strong>D-type</strong> (dichotomous): percentage of items rated 3–4 ("easy"), yielding 13 fixed values (0, 8.3, 16.7 &hellip; 100).</p>
+    <p>Each <strong>coloured bubble</strong> represents one (P-type, D-type) combination. <strong>Bubble area</strong> is proportional to the percentage of all 16.7M patterns that fall in that cell. Colour encodes the direction of change after dichotomisation:
+      <span class="pill-inline" style="background:#f0fdf4;color:#2E7D32;border:1px solid #a5d6a7;">D &gt; P &mdash; higher</span>
+      <span class="pill-inline" style="background:#fff8f0;color:#E65100;border:1px solid #ffcc80;">D = P &mdash; no change</span>
+      <span class="pill-inline" style="background:#fff5f5;color:#B71C1C;border:1px solid #ef9a9a;">D &lt; P &mdash; lower</span>
+    </p>
+    <p>The <strong>dashed circle</strong> at position (P, P) on the diagonal shows the <em>marginal</em> percentage of patterns that produce that P-type value — i.e., how common this P-type score is across all possible response combinations.</p>
+    <p>By design, the Higher and Lower groups are perfectly symmetric (each ~41.9% of patterns), while ~16.1% show no change. The diagonal line D&nbsp;=&nbsp;P separates higher (above) from lower (below) transitions.</p>
+    <p>Use the <strong>P-type slider</strong> to explore any score, <strong>▶ Play</strong> to animate across all values, the <strong>Show</strong> filters to isolate transition types, and the <strong>Bubble scale</strong> slider to resize bubbles.</p>
+  </div>
+
+  <div class="card">
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="pills"></div>
+
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font-size:12px;color:#555;white-space:nowrap;">P-type score:</span>
+      <input type="range" id="sl" min="0" max="36" step="1" value="18" style="flex:1;min-width:120px;max-width:300px;">
+      <span style="font-size:15px;font-weight:700;color:#042C53;min-width:46px;" id="pv">50.0</span>
+      <button id="pb" onclick="togglePlay()" style="padding:5px 14px;font-size:11px;border-radius:5px;border:1.5px solid #042C53;cursor:pointer;background:#fff;color:#042C53;font-family:inherit;min-width:68px;font-weight:600;touch-action:manipulation;">▶ Play</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font-size:11px;color:#888;white-space:nowrap;">Bubble scale:</span>
+      <input type="range" id="scl" min="10" max="80" step="5" value="30" style="max-width:160px;">
+      <span style="font-size:11px;color:#555;min-width:28px;" id="scl-val">30</span>
+      <span style="font-size:11px;color:#aaa;">(drag to resize all bubbles)</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="filter-row">
+      <span style="font-size:11px;color:#888;white-space:nowrap;">Show:</span>
+    </div>
+
+    <div style="position:relative;width:100%;height:440px;">
+      <canvas id="ch"></canvas>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#555;align-items:center;">
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#2E7D32;display:inline-block;opacity:0.7;"></span>D &gt; P &mdash; higher</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#E65100;display:inline-block;opacity:0.7;"></span>D = P &mdash; no change</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#B71C1C;display:inline-block;opacity:0.7;"></span>D &lt; P &mdash; lower</span>
+      <span style="display:flex;align-items:center;gap:5px;"><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="3,2"/></svg>P-type marginal %</span>
+      <span style="color:#aaa;">― ― D = P diagonal &nbsp;|&nbsp; bubble area &prop; % of 4<sup>12</sup> patterns</span>
+    </div>
+
+    <p style="font-size:11px;color:#aaa;margin-top:10px;line-height:1.6;">
+      Hover or tap any bubble for details. Click the same filter button again to return to "All". The dashed circle sits on the diagonal at (P, P) and scales with the marginal frequency of that P-type value.
+    </p>
+  </div>
+</div>
+
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025) &middot; doi:10.3390/healthcare13192541</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var ROWS={"0.0":[[0.0,1,0.0]],"2.8":[[0.0,12,0.0]],"5.6":[[0.0,66,0.0],[8.3,12,0.0]],"8.3":[[0.0,220,0.001],[8.3,144,0.001]],"11.1":[[0.0,495,0.003],[8.3,792,0.005],[16.7,66,0.0]],"13.9":[[0.0,792,0.005],[8.3,2640,0.016],[16.7,792,0.005]],"16.7":[[0.0,924,0.006],[8.3,5940,0.035],[16.7,4356,0.026],[25.0,220,0.001]],"19.4":[[0.0,792,0.005],[8.3,9504,0.057],[16.7,14520,0.087],[25.0,2640,0.016]],"22.2":[[0.0,495,0.003],[8.3,11088,0.066],[16.7,32670,0.195],[25.0,14520,0.087],[33.3,495,0.003]],"25.0":[[0.0,220,0.001],[8.3,9504,0.057],[16.7,52272,0.312],[25.0,48400,0.288],[33.3,5940,0.035]],"27.8":[[0.0,66,0.0],[8.3,5940,0.035],[16.7,60984,0.363],[25.0,108900,0.649],[33.3,32670,0.195],[41.7,792,0.005]],"30.6":[[0.0,12,0.0],[8.3,2640,0.016],[16.7,52272,0.312],[25.0,174240,1.039],[33.3,108900,0.649],[41.7,9504,0.057]],"33.3":[[0.0,1,0.0],[8.3,792,0.005],[16.7,32670,0.195],[25.0,203280,1.212],[33.3,245025,1.46],[41.7,52272,0.312],[50.0,924,0.006]],"36.1":[[8.3,144,0.001],[16.7,14520,0.087],[25.0,174240,1.039],[33.3,392040,2.337],[41.7,174240,1.039],[50.0,11088,0.066]],"38.9":[[8.3,12,0.0],[16.7,4356,0.026],[25.0,108900,0.649],[33.3,457380,2.726],[41.7,392040,2.337],[50.0,60984,0.363],[58.3,792,0.005]],"41.7":[[16.7,792,0.005],[25.0,48400,0.288],[33.3,392040,2.337],[41.7,627264,3.739],[50.0,203280,1.212],[58.3,9504,0.057]],"44.4":[[16.7,66,0.0],[25.0,14520,0.087],[33.3,245025,1.46],[41.7,731808,4.362],[50.0,457380,2.726],[58.3,52272,0.312],[66.7,495,0.003]],"47.2":[[25.0,2640,0.016],[33.3,108900,0.649],[41.7,627264,3.739],[50.0,731808,4.362],[58.3,174240,1.039],[66.7,5940,0.035]],"50.0":[[25.0,220,0.001],[33.3,32670,0.195],[41.7,392040,2.337],[50.0,853776,5.089],[58.3,392040,2.337],[66.7,32670,0.195],[75.0,220,0.001]],"52.8":[[33.3,5940,0.035],[41.7,174240,1.039],[50.0,731808,4.362],[58.3,627264,3.739],[66.7,108900,0.649],[75.0,2640,0.016]],"55.6":[[33.3,495,0.003],[41.7,52272,0.312],[50.0,457380,2.726],[58.3,731808,4.362],[66.7,245025,1.46],[75.0,14520,0.087],[83.3,66,0.0]],"58.3":[[41.7,9504,0.057],[50.0,203280,1.212],[58.3,627264,3.739],[66.7,392040,2.337],[75.0,48400,0.288],[83.3,792,0.005]],"61.1":[[41.7,792,0.005],[50.0,60984,0.363],[58.3,392040,2.337],[66.7,457380,2.726],[75.0,108900,0.649],[83.3,4356,0.026],[91.7,12,0.0]],"63.9":[[50.0,11088,0.066],[58.3,174240,1.039],[66.7,392040,2.337],[75.0,174240,1.039],[83.3,14520,0.087],[91.7,144,0.001]],"66.7":[[50.0,924,0.006],[58.3,52272,0.312],[66.7,245025,1.46],[75.0,203280,1.212],[83.3,32670,0.195],[91.7,792,0.005],[100.0,1,0.0]],"69.4":[[58.3,9504,0.057],[66.7,108900,0.649],[75.0,174240,1.039],[83.3,52272,0.312],[91.7,2640,0.016],[100.0,12,0.0]],"72.2":[[58.3,792,0.005],[66.7,32670,0.195],[75.0,108900,0.649],[83.3,60984,0.363],[91.7,5940,0.035],[100.0,66,0.0]],"75.0":[[66.7,5940,0.035],[75.0,48400,0.288],[83.3,52272,0.312],[91.7,9504,0.057],[100.0,220,0.001]],"77.8":[[66.7,495,0.003],[75.0,14520,0.087],[83.3,32670,0.195],[91.7,11088,0.066],[100.0,495,0.003]],"80.6":[[75.0,2640,0.016],[83.3,14520,0.087],[91.7,9504,0.057],[100.0,792,0.005]],"83.3":[[75.0,220,0.001],[83.3,4356,0.026],[91.7,5940,0.035],[100.0,924,0.006]],"86.1":[[83.3,792,0.005],[91.7,2640,0.016],[100.0,792,0.005]],"88.9":[[83.3,66,0.0],[91.7,792,0.005],[100.0,495,0.003]],"91.7":[[91.7,144,0.001],[100.0,220,0.001]],"94.4":[[91.7,12,0.0],[100.0,66,0.0]],"97.2":[[100.0,12,0.0]],"100.0":[[100.0,1,0.0]]};
+var MARG={"0.0":0.0,"2.8":0.0,"5.6":0.0,"8.3":0.002,"11.1":0.008,"13.9":0.025,"16.7":0.068,"19.4":0.164,"22.2":0.353,"25.0":0.693,"27.8":1.248,"30.6":2.072,"33.3":3.189,"36.1":4.567,"38.9":6.106,"41.7":7.637,"44.4":8.95,"47.2":9.839,"50.0":10.154,"52.8":9.839,"55.6":8.95,"58.3":7.637,"61.1":6.106,"63.9":4.567,"66.7":3.189,"69.4":2.072,"72.2":1.248,"75.0":0.693,"77.8":0.353,"80.6":0.164,"83.3":0.068,"86.1":0.025,"88.9":0.008,"91.7":0.002,"94.4":0.0,"97.2":0.0,"100.0":0.0};
+var PVALS=[0.0,2.8,5.6,8.3,11.1,13.9,16.7,19.4,22.2,25.0,27.8,30.6,33.3,36.1,38.9,41.7,44.4,47.2,50.0,52.8,55.6,58.3,61.1,63.9,66.7,69.4,72.2,75.0,77.8,80.6,83.3,86.1,88.9,91.7,94.4,97.2,100.0];
+var COL={higher:{f:'rgba(46,125,50,0.55)',b:'rgba(46,125,50,0.95)'},same:{f:'rgba(230,81,0,0.6)',b:'rgba(230,81,0,1)'},lower:{f:'rgba(183,28,28,0.55)',b:'rgba(183,28,28,0.95)'}};
+var FBDEFS=[
+  {key:'all',   lbl:'All',       ibg:'#fff',   ibd:'#042C53',itx:'#042C53',abg:'#042C53',abd:'#042C53',atx:'#fff'},
+  {key:'higher',lbl:'D &gt; P',  ibg:'#f0fdf4',ibd:'#2E7D32',itx:'#2E7D32',abg:'#2E7D32',abd:'#2E7D32',atx:'#fff'},
+  {key:'same',  lbl:'D = P',     ibg:'#fff8f0',ibd:'#E65100',itx:'#E65100',abg:'#E65100',abd:'#E65100',atx:'#fff'},
+  {key:'lower', lbl:'D &lt; P',  ibg:'#fff5f5',ibd:'#B71C1C',itx:'#B71C1C',abg:'#B71C1C',abd:'#B71C1C',atx:'#fff'}
+];
+var curIdx=18,filter='all',scale=30,playTimer=null,chart=null,fbEls={};
+
+function fbSty(def,active){
+  var bg=active?def.abg:def.ibg,bd=active?def.abd:def.ibd,tx=active?def.atx:def.itx;
+  return 'padding:5px 13px;font-size:12px;border-radius:6px;border:1.5px solid '+bd+
+    ';cursor:pointer;background:'+bg+';color:'+tx+
+    ';font-family:inherit;touch-action:manipulation;white-space:nowrap;font-weight:'+(active?'700':'500')+';min-height:32px;';
+}
+(function(){
+  var row=document.getElementById('filter-row');
+  FBDEFS.forEach(function(def){
+    var btn=document.createElement('button');
+    btn.style.cssText=fbSty(def,def.key==='all');
+    btn.innerHTML=def.lbl;
+    btn.onclick=function(){setFilter(def.key);};
+    row.appendChild(btn);
+    fbEls[def.key]=btn;
+  });
+})();
+function setFilter(f){
+  filter=f;
+  FBDEFS.forEach(function(def){fbEls[def.key].style.cssText=fbSty(def,def.key===f);fbEls[def.key].innerHTML=def.lbl;});
+  render(false);
+}
+function gk(p){return Object.keys(ROWS).find(function(k){return Math.abs(parseFloat(k)-p)<0.05;});}
+function mk(p){return Object.keys(MARG).find(function(k){return Math.abs(parseFloat(k)-p)<0.05;});}
+function dir(p,d){return d>p?'higher':d<p?'lower':'same';}
+
+var ovPlugin={id:'ov',afterDraw:function(ch){
+  var xs=ch.scales.x,ys=ch.scales.y,ctx=ch.ctx,p=PVALS[curIdx];
+  var x0=xs.getPixelForValue(0),y0=ys.getPixelForValue(0),x1=xs.getPixelForValue(100),y1=ys.getPixelForValue(100);
+  ctx.save();
+  ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(80,80,80,0.28)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+  var mx=xs.getPixelForValue(55),my=ys.getPixelForValue(58);
+  ctx.setLineDash([]);ctx.fillStyle='rgba(80,80,80,0.4)';ctx.font='10px sans-serif';
+  ctx.save();ctx.translate(mx,my);ctx.rotate(-Math.atan2(y1-y0,x1-x0));ctx.fillText('D = P',0,-5);ctx.restore();
+  var xp=xs.getPixelForValue(p);
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(4,44,83,0.18)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(xp,ys.getPixelForValue(108));ctx.lineTo(xp,ys.getPixelForValue(-5));ctx.stroke();
+  ctx.setLineDash([]);
+  var mkey=mk(p),mpct=mkey?MARG[mkey]:0;
+  if(mpct>0){
+    var cx=xs.getPixelForValue(p),cy=ys.getPixelForValue(p),rPx=Math.sqrt(mpct*scale)+2;
+    ctx.save();
+    ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(50,50,50,0.65)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx,cy,rPx,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(50,50,50,0.65)';ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    if(rPx>14){ctx.fillText(mpct.toFixed(1)+'%',cx,cy);}
+    else{ctx.fillText(mpct.toFixed(1)+'%',cx,cy-rPx-7);}
+    ctx.restore();
+  }
+  ctx.restore();
+}};
+
+function buildDs(pIdx){
+  var p=PVALS[pIdx],key=gk(p);
+  if(!key) return [];
+  var byDir={higher:[],same:[],lower:[]};
+  ROWS[key].forEach(function(r){
+    var d=r[0],cnt=r[1],pct=r[2],dd=dir(p,d);
+    if(filter!=='all'&&dd!==filter) return;
+    byDir[dd].push({x:d,y:p,r:Math.sqrt(pct*scale)+2,pct:pct,cnt:cnt,dir:dd});
+  });
+  var ds=[];
+  ['higher','same','lower'].forEach(function(dd){
+    if(!byDir[dd].length) return;
+    ds.push({label:dd,data:byDir[dd],backgroundColor:COL[dd].f,borderColor:COL[dd].b,borderWidth:1.5,hoverBackgroundColor:COL[dd].b});
+  });
+  return ds;
+}
+function updatePills(pIdx){
+  var p=PVALS[pIdx],key=gk(p),mkey=mk(p),mpct=mkey?MARG[mkey]:0;
+  var stats={higher:0,same:0,lower:0};
+  if(key) ROWS[key].forEach(function(r){stats[dir(p,r[0])]+=r[2];});
+  document.getElementById('pills').innerHTML=
+    '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#f0fdf4;color:#2E7D32;border:1px solid #a5d6a7;">&#9650; Higher: '+stats.higher.toFixed(1)+'%</span> '+
+    '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#fff8f0;color:#E65100;border:1px solid #ffcc80;">= No change: '+stats.same.toFixed(1)+'%</span> '+
+    '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#fff5f5;color:#B71C1C;border:1px solid #ef9a9a;">&#9660; Lower: '+stats.lower.toFixed(1)+'%</span> '+
+    '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#f4f6f9;color:#042C53;border:1px solid #ccc;">P-type = '+p.toFixed(1)+'</span> '+
+    '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:#f9f9f9;color:#444;border:1.5px dashed #777;">&#9675; Marginal: '+mpct.toFixed(3)+'%</span>';
+}
+function render(anim){
+  updatePills(curIdx);
+  document.getElementById('pv').textContent=PVALS[curIdx].toFixed(1);
+  var ds=buildDs(curIdx);
+  if(!chart){
+    chart=new Chart(document.getElementById('ch'),{
+      type:'bubble',plugins:[ovPlugin],data:{datasets:ds},
+      options:{
+        animation:{duration:anim?280:0},responsive:true,maintainAspectRatio:false,
+        layout:{padding:{top:22,right:12,bottom:5,left:5}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{
+          title:function(){return '';},
+          label:function(c){
+            var d=c.raw,dd=d.dir==='higher'?'D > P (higher)':d.dir==='lower'?'D < P (lower)':'D = P (no change)';
+            return['P-type: '+d.y.toFixed(1)+'  \u2192  D-type: '+d.x.toFixed(1),dd,'Patterns: '+d.cnt.toLocaleString()+' ('+d.pct.toFixed(3)+'%)'];
+          }
+        }}},
+        scales:{
+          x:{min:-5,max:108,title:{display:true,text:'D-type score',font:{size:12},color:'#555'},ticks:{callback:function(v){return v>=0&&v<=100?v:null;},font:{size:10}},grid:{color:'#f0f0f0'}},
+          y:{min:-5,max:108,title:{display:true,text:'P-type score',font:{size:12},color:'#555'},ticks:{callback:function(v){return v>=0&&v<=100?v:null;},font:{size:10}},grid:{color:'#f0f0f0'}}
+        }
+      }
+    });
+  } else {
+    chart.data.datasets=ds;chart.options.animation.duration=anim?280:0;chart.update();
+  }
+}
+document.getElementById('sl').addEventListener('input',function(){curIdx=parseInt(this.value);render(true);});
+document.getElementById('scl').addEventListener('input',function(){
+  scale=parseInt(this.value);document.getElementById('scl-val').textContent=this.value;render(false);
+});
+function togglePlay(){
+  if(playTimer){
+    clearInterval(playTimer);playTimer=null;
+    document.getElementById('pb').textContent='▶ Play';
+    document.getElementById('pb').style.background='#fff';document.getElementById('pb').style.color='#042C53';
+  } else {
+    document.getElementById('pb').textContent='⏹ Stop';
+    document.getElementById('pb').style.background='#042C53';document.getElementById('pb').style.color='#fff';
+    playTimer=setInterval(function(){curIdx=(curIdx+1)%PVALS.length;document.getElementById('sl').value=curIdx;render(true);},550);
+  }
+}
+render(false);
+</script>
+</body>
+</html>
