@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — Figure 2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+header { background: #042C53; color: #fff; padding: 28px 40px 20px; }
+header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+header p  { font-size: 13px; color: #B5D4F4; }
+.container { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
+.card { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.panel { background: #fff; border: 1px solid #e0e5ec; border-radius: 10px; padding: 16px 18px; }
+.stat-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.stat { background: #f4f7fb; border-radius: 6px; padding: 5px 8px; text-align: center; flex: 1; min-width: 52px; }
+.stat-val { font-size: 13px; font-weight: 600; color: #042C53; }
+.stat-lbl { font-size: 9px; color: #aaa; margin-top: 1px; }
+footer { text-align: center; font-size: 11px; color: #aaa; padding: 20px 0 30px; }
+@media (max-width: 620px) { header { padding: 20px; } .container { padding: 16px; } .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>HLS<sub>19</sub> Greek Versions &mdash; Figure 2</h1>
+  <p>Score distributions: P-type &amp; D-type &middot; Figure 2 &middot; Flokou et al., <em>Healthcare</em> 2025 &middot; N=71</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;" id="tabs"></div>
+  </div>
+  <div class="grid" id="panels"></div>
+  <p style="font-size:11px;color:#aaa;margin-top:14px;text-align:center;">Hover or tap any bar for details.</p>
+</div>
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025)</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var SCALES = {"NAV": {"ptype": {"mean": 51.1, "median": 50, "sd": 21.08, "iqr": 25.0, "min": 0, "max": 100, "skew": 0.32, "q1": 37.5, "q3": 62.5, "bins": [0, 7.69, 15.38, 23.08, 30.77, 38.46, 46.15, 53.85, 61.54, 69.23, 76.92, 84.62, 92.31, 100], "counts": [2, 1, 3, 7, 11, 14, 13, 8, 5, 3, 2, 1, 1]}, "dtype": {"mean": 49.53, "median": 50, "sd": 32.79, "iqr": 58.33, "min": 0, "max": 100, "skew": 0.09, "q1": 16.67, "q3": 75.0, "bins": [0, 8.33, 16.67, 25, 33.33, 41.67, 50, 58.33, 66.67, 75, 83.33, 91.67, 100], "counts": [5, 3, 4, 6, 5, 4, 8, 4, 6, 7, 6, 8]}}, "COM": {"ptype": {"mean": 63.56, "median": 63.64, "sd": 17.24, "iqr": 15.15, "min": 15.15, "max": 100, "skew": 0.14, "q1": 56.06, "q3": 71.21, "bins": [15.15, 23.23, 31.31, 39.39, 47.47, 55.56, 63.64, 71.72, 79.8, 87.88, 95.96, 100], "counts": [1, 1, 2, 4, 7, 16, 17, 12, 7, 3, 1]}, "dtype": {"mean": 72.65, "median": 81.82, "sd": 26.75, "iqr": 31.82, "min": 0, "max": 100, "skew": -1.0, "q1": 63.64, "q3": 95.45, "bins": [0, 9.09, 18.18, 27.27, 36.36, 45.45, 54.55, 63.64, 72.73, 81.82, 90.91, 100], "counts": [2, 1, 2, 3, 3, 4, 5, 5, 6, 20, 10]}}, "VAC": {"ptype": {"mean": 69.84, "median": 66.67, "sd": 20.43, "iqr": 29.17, "min": 33.33, "max": 100, "skew": -0.12, "q1": 54.17, "q3": 83.33, "bins": [33.33, 38.89, 44.44, 50, 55.56, 61.11, 66.67, 72.22, 77.78, 83.33, 88.89, 94.44, 100], "counts": [2, 3, 5, 7, 6, 9, 9, 8, 8, 7, 4, 3]}, "dtype": {"mean": 78.52, "median": 100, "sd": 32.26, "iqr": 25.0, "min": 0, "max": 100, "skew": -1.34, "q1": 75.0, "q3": 100, "bins": [0, 20, 40, 60, 80, 100], "counts": [4, 5, 6, 8, 48]}}};
+var TABS   = [{"key": "NAV", "lbl": "HLS19-NAV-GR"}, {"key": "COM", "lbl": "HLS19-COM-GR"}, {"key": "VAC", "lbl": "HLS19-VAC-GR"}];
+var UI = {
+  ptype_lbl: "P-type score (polytomous)",
+  dtype_lbl: "D-type score (dichotomous)",
+  scale_n:   "0\u2013100 scale \u00b7 N=",
+  mean:  "Mean",
+  med:   "Median",
+  sd:    "SD",
+  skew:  "Skewness",
+  freq:  "n",
+  med_sym:  "Med=",
+  mean_sym: "\u25c7=mean"
+};
+
+var current='NAV';
+var chartInstances={};
+var tabEls={};
+
+function tabSty(active){
+  if(active) return 'padding:7px 16px;font-size:13px;border-radius:7px;border:1px solid #042C53;cursor:pointer;background:#042C53;color:#fff;font-family:inherit;touch-action:manipulation;font-weight:500;min-height:38px;';
+  return 'padding:7px 16px;font-size:13px;border-radius:7px;border:1px solid #bbb;cursor:pointer;background:#fff;color:#555;font-family:inherit;touch-action:manipulation;min-height:38px;';
+}
+
+(function(){
+  var c=document.getElementById('tabs');
+  TABS.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.style.cssText=tabSty(t.key==='NAV');
+    btn.textContent=t.lbl;
+    btn.onclick=function(){setScale(t.key);};
+    c.appendChild(btn);
+    tabEls[t.key]=btn;
+  });
+})();
+
+function setScale(s){
+  current=s;
+  TABS.forEach(function(t){
+    tabEls[t.key].style.cssText=tabSty(t.key===s);
+    tabEls[t.key].textContent=t.lbl;
+  });
+  renderAll();
+}
+
+function destroyAll(){
+  Object.keys(chartInstances).forEach(function(k){chartInstances[k].destroy();});
+  chartInstances={};
+}
+
+function stat(val,lbl){
+  return '<div class="stat"><div class="stat-val">'+val+'</div><div class="stat-lbl">'+lbl+'</div></div>';
+}
+
+function renderAll(){
+  destroyAll();
+  var sc=SCALES[current];
+  document.getElementById('panels').innerHTML='<div class="panel" id="panelP"></div><div class="panel" id="panelD"></div>';
+  buildPanel('P',sc.ptype,'#185FA5','#B5D4F4',UI.ptype_lbl);
+  buildPanel('D',sc.dtype,'#0F6E56','#9FE1CB',UI.dtype_lbl);
+}
+
+function buildPanel(type,d,col,colLight,label){
+  var n=d.counts.reduce(function(a,b){return a+b;},0);
+  var el=document.getElementById('panel'+type);
+  el.innerHTML=
+    '<div style="font-size:13px;font-weight:500;color:#333;margin-bottom:3px;">'+label+'</div>'+
+    '<div style="font-size:11px;color:#999;margin-bottom:12px;">'+UI.scale_n+n+'</div>'+
+    '<div class="stat-row">'+
+      stat(d.mean.toFixed(1),UI.mean)+stat(d.median.toFixed(1),UI.med)+
+      stat(d.sd.toFixed(1),UI.sd)+stat(d.skew.toFixed(2),UI.skew)+
+    '</div>'+
+    '<div style="position:relative;height:200px;"><canvas id="hist'+type+'"></canvas></div>'+
+    '<canvas id="box'+type+'" height="52" style="display:block;width:100%;"></canvas>';
+
+  var binLabels=d.bins.slice(0,-1).map(function(b,i){
+    return Math.round(b)+'–'+Math.round(d.bins[i+1]);
+  });
+  var drawn=false;
+  var boxPlugin={
+    id:'bp'+type,
+    afterDraw:function(chart){
+      if(drawn) return;
+      drawn=true;
+      drawBox('box'+type,d,col,colLight,chart);
+    }
+  };
+  chartInstances['hist'+type]=new Chart(document.getElementById('hist'+type),{
+    type:'bar',plugins:[boxPlugin],
+    data:{labels:binLabels,datasets:[{data:d.counts,backgroundColor:colLight,borderColor:col,
+      borderWidth:1.5,borderRadius:2,hoverBackgroundColor:col,barPercentage:1.0,categoryPercentage:1.0}]},
+    options:{animation:false,responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        title:function(i){return 'Score: '+i[0].label;},
+        label:function(i){return UI.freq+' = '+i.raw;}
+      }}},
+      scales:{
+        x:{offset:false,ticks:{font:{size:9},maxRotation:45,color:'#aaa',autoSkip:true,maxTicksLimit:7},grid:{display:false}},
+        y:{ticks:{font:{size:9},color:'#aaa'},grid:{color:'#f3f3f3'},
+           title:{display:true,text:UI.freq,font:{size:9},color:'#ccc'}}
+      }
+    }
+  });
+}
+
+function drawBox(canvasId,d,col,colLight,chartInst){
+  var canvas=document.getElementById(canvasId);
+  if(!canvas||!chartInst.chartArea) return;
+  var ca=chartInst.chartArea,W=chartInst.canvas.offsetWidth;
+  canvas.width=W;
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,52);
+  var pL=ca.left,pR=ca.right;
+  function toX(v){return pL+(v/100)*(pR-pL);}
+  var midY=22,boxH=16,q1=d.q1,q3=d.q3;
+  var wLo=Math.max(d.min,q1-1.5*(q3-q1)),wHi=Math.min(d.max,q3+1.5*(q3-q1));
+  ctx.strokeStyle='#ddd';ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(pL,midY+boxH/2+5);ctx.lineTo(pR,midY+boxH/2+5);ctx.stroke();
+  ctx.fillStyle='#aaa';ctx.font='9px sans-serif';ctx.textAlign='center';
+  [0,25,50,75,100].forEach(function(t){
+    var x=toX(t);
+    ctx.strokeStyle='#ddd';ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(x,midY+boxH/2+5);ctx.lineTo(x,midY+boxH/2+9);ctx.stroke();
+    ctx.fillText(t,x,52);
+  });
+  ctx.strokeStyle=col;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(toX(wLo),midY);ctx.lineTo(toX(q1),midY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(toX(q3),midY);ctx.lineTo(toX(wHi),midY);ctx.stroke();
+  [wLo,wHi].forEach(function(v){
+    ctx.beginPath();ctx.moveTo(toX(v),midY-5);ctx.lineTo(toX(v),midY+5);ctx.stroke();
+  });
+  ctx.fillStyle=colLight;
+  ctx.fillRect(toX(q1),midY-boxH/2,toX(q3)-toX(q1),boxH);
+  ctx.strokeStyle=col;ctx.lineWidth=1.5;
+  ctx.strokeRect(toX(q1),midY-boxH/2,toX(q3)-toX(q1),boxH);
+  ctx.strokeStyle=col;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(toX(d.median),midY-boxH/2);ctx.lineTo(toX(d.median),midY+boxH/2);ctx.stroke();
+  var mx=toX(d.mean);
+  ctx.fillStyle='#fff';ctx.strokeStyle=col;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(mx,midY-5);ctx.lineTo(mx+5,midY);ctx.lineTo(mx,midY+5);ctx.lineTo(mx-5,midY);
+  ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle=col;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+  ctx.fillText(UI.med_sym+d.median.toFixed(0),toX(d.median),midY-boxH/2-4);
+  ctx.fillStyle='#bbb';ctx.font='9px sans-serif';ctx.textAlign='left';
+  ctx.fillText(UI.mean_sym,pL,11);
+}
+
+renderAll();
+</script>
+</body>
+</html>
