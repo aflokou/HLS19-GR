@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — P-type (polytomous) Marginal Distribution</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:#f4f6f9; color:#222; }
+header { background:#042C53; color:#fff; padding:28px 40px 20px; }
+header h1 { font-size:22px; font-weight:600; margin-bottom:6px; }
+header p  { font-size:13px; color:#B5D4F4; }
+.container { max-width:1060px; margin:0 auto; padding:28px 32px; }
+.expl { background:#fff; border:1px solid #e0e5ec; border-radius:12px; padding:20px 24px; margin-bottom:22px; font-size:13px; color:#444; line-height:1.75; }
+.expl h2 { font-size:15px; font-weight:600; color:#042C53; margin-bottom:10px; }
+.expl p { margin-bottom:8px; }
+.expl p:last-child { margin-bottom:0; }
+.pi { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11px; font-weight:600; vertical-align:middle; margin:0 2px; }
+.controls { background:#fff; border:1px solid #e0e5ec; border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.cl { font-size:11px; color:#888; white-space:nowrap; }
+.grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+.panel { background:#fff; border:1px solid #e0e5ec; border-radius:10px; padding:16px 18px; }
+.ptitle { font-size:13px; font-weight:600; margin-bottom:2px; }
+.psub   { font-size:11px; color:#999; margin-bottom:10px; line-height:1.5; }
+.stat-row { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.stat { background:#f4f7fb; border-radius:6px; padding:5px 8px; text-align:center; flex:1; min-width:52px; }
+.sv { font-size:13px; font-weight:600; color:#042C53; }
+.sl { font-size:9px; color:#aaa; margin-top:1px; }
+.pnote { font-size:10px; color:#555; margin-top:8px; padding:7px 10px; border-radius:6px; line-height:1.55; }
+footer { text-align:center; font-size:11px; color:#aaa; padding:20px 0 30px; }
+@media (max-width:660px) { header{padding:20px;} .container{padding:16px;} .grid{grid-template-columns:1fr;} .controls{padding:12px 14px;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>HLS<sub>19</sub> Greek Versions &mdash; P-type (polytomous) Score: Marginal Distribution</h1>
+  <p>How many response patterns yield each P-type score? &middot; NAV (4<sup>12</sup>) &middot; COM (4<sup>11</sup>) &middot; VAC (4<sup>4</sup>) &middot; Flokou et al., <em>Healthcare</em> 2025</p>
+</header>
+
+<div class="container">
+  <div class="expl">
+    <h2>What does this chart show?</h2>
+    <p>For each possible <strong>P-type score</strong>, the bar height shows <em>how many of all theoretical response patterns</em> produce that score. This is the marginal (unconditional) distribution of P-type scores across all 4<sup>k</sup> equally likely patterns.</p>
+    <p><strong>P-type</strong> scores are computed as the mean of the k item ratings (1–4), rescaled to 0–100. Because items take 4 integer values, P-type can take many distinct values — more items means more possible means.</p><p>The distribution is <strong>approximately binomial</strong>, symmetric around 50, and unimodal for <em>even</em> k (NAV 12-item, VAC 4-item) but produces a <strong>flat double-peak</strong> for <em>odd</em> k (COM 11-item), because the exact midpoint P=50.0 is unreachable.</p>
+    <p>Use the <strong>Scale</strong> selector to view one scale at full width, and <strong>Y-axis</strong> to switch between raw counts and percentages.</p>
+  </div>
+
+  <div class="controls">
+    <span class="cl">Scale:</span>
+    <div id="scale-btns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <span class="cl" style="margin-left:10px;">Y-axis:</span>
+    <div id="y-btns" style="display:flex;gap:6px;"></div>
+  </div>
+
+  <div id="panels-wrap"></div>
+</div>
+
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025) &middot; doi:10.3390/healthcare13192541</footer>
+<div id="tip" style="position:fixed;background:#fff;border:1px solid #dde3ec;border-radius:8px;padding:9px 13px;font-size:12px;line-height:1.7;pointer-events:none;opacity:0;transition:opacity 0.1s;max-width:240px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:200;color:#333;"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var DATA = {"NAV":{"label":"HLS19-NAV-GR","n":12,"total":16777216,"col":"#185FA5","colL":"#B5D4F4","n_vals":37,"peak_p":50.0,"peak_pct":10.1545,"note":"12 items (even) \u2192 P=50.0 is reachable. Single peak at P=50.0 (10.15%). Smooth bell-shaped (binomial-like) distribution with 37 distinct values.","rows":[[0.0,1,0.0],[2.8,12,0.0001],[5.6,78,0.0005],[8.3,364,0.0022],[11.1,1353,0.0081],[13.9,4224,0.0252],[16.7,11440,0.0682],[19.4,27456,0.1637],[22.2,59268,0.3533],[25.0,116336,0.6934],[27.8,209352,1.2478],[30.6,347568,2.0717],[33.3,534964,3.1886],[36.1,766272,4.5673],[38.9,1024464,6.1063],[41.7,1281280,7.637],[44.4,1501566,8.95],[47.2,1650792,9.8395],[50.0,1703636,10.1545],[52.8,1650792,9.8395],[55.6,1501566,8.95],[58.3,1281280,7.637],[61.1,1024464,6.1063],[63.9,766272,4.5673],[66.7,534964,3.1886],[69.4,347568,2.0717],[72.2,209352,1.2478],[75.0,116336,0.6934],[77.8,59268,0.3533],[80.6,27456,0.1637],[83.3,11440,0.0682],[86.1,4224,0.0252],[88.9,1353,0.0081],[91.7,364,0.0022],[94.4,78,0.0005],[97.2,12,0.0001],[100.0,1,0.0]]},"COM":{"label":"HLS19-COM-GR","n":11,"total":4194304,"col":"#185FA5","colL":"#B5D4F4","n_vals":34,"peak_p":48.5,"peak_pct":10.502,"note":"11 items (odd) \u2192 P=50.0 is impossible. The peak splits symmetrically into P=48.5 and P=51.5 (each 10.50%) \u2014 a mathematical artefact, not real bimodality.","rows":[[0.0,1,0.0],[3.0,11,0.0003],[6.1,66,0.0016],[9.1,286,0.0068],[12.1,990,0.0236],[15.2,2882,0.0687],[18.2,7282,0.1736],[21.2,16302,0.3887],[24.2,32802,0.7821],[27.3,59950,1.4293],[30.3,100298,2.3913],[33.3,154518,3.684],[36.4,220198,5.2499],[39.4,291258,6.9441],[42.4,358490,8.5471],[45.5,411334,9.807],[48.5,440484,10.502],[51.5,440484,10.502],[54.5,411334,9.807],[57.6,358490,8.5471],[60.6,291258,6.9441],[63.6,220198,5.2499],[66.7,154518,3.684],[69.7,100298,2.3913],[72.7,59950,1.4293],[75.8,32802,0.7821],[78.8,16302,0.3887],[81.8,7282,0.1736],[84.8,2882,0.0687],[87.9,990,0.0236],[90.9,286,0.0068],[93.9,66,0.0016],[97.0,11,0.0003],[100.0,1,0.0]]},"VAC":{"label":"HLS19-VAC-GR","n":4,"total":256,"col":"#BA7517","colL":"#FAC775","n_vals":13,"peak_p":50.0,"peak_pct":17.1875,"note":"4 items (even) \u2192 P=50.0 is reachable. Single peak at P=50.0 (17.19%). Only 13 distinct values \u2014 the distribution is coarser and more uniform than NAV/COM.","rows":[[0.0,1,0.3906],[8.3,4,1.5625],[16.7,10,3.9062],[25.0,20,7.8125],[33.3,31,12.1094],[41.7,40,15.625],[50.0,44,17.1875],[58.3,40,15.625],[66.7,31,12.1094],[75.0,20,7.8125],[83.3,10,3.9062],[91.7,4,1.5625],[100.0,1,0.3906]]}};
+var AXIS_LABEL = "P-type score";
+var SCORE_TYPE = "P-type";
+var curScale = 'all';
+var curY = 'count';
+var charts = {};
+
+// --- Button builders ---
+var SCALE_DEFS = [
+  {key:'all',lbl:'All scales',ibg:'#fff',ibd:'#042C53',itx:'#042C53',abg:'#042C53',abd:'#042C53',atx:'#fff'},
+  {key:'NAV',lbl:'NAV only',  ibg:'#EAF2FC',ibd:'#185FA5',itx:'#185FA5',abg:'#185FA5',abd:'#185FA5',atx:'#fff'},
+  {key:'COM',lbl:'COM only',  ibg:'#EAF8F4',ibd:'#0F6E56',itx:'#0F6E56',abg:'#0F6E56',abd:'#0F6E56',atx:'#fff'},
+  {key:'VAC',lbl:'VAC only',  ibg:'#FFF8EC',ibd:'#BA7517',itx:'#BA7517',abg:'#BA7517',abd:'#BA7517',atx:'#fff'}
+];
+var Y_DEFS = [
+  {key:'count',lbl:'Count',   ibg:'#fff',   ibd:'#042C53',itx:'#042C53',abg:'#042C53',abd:'#042C53',atx:'#fff'},
+  {key:'pct',  lbl:'Percent', ibg:'#f4f6f9',ibd:'#6B7A90', itx:'#6B7A90', abg:'#6B7A90',abd:'#6B7A90',atx:'#fff'}
+];
+var scaleBtns={}, yBtns={};
+
+function bSty(def,active){
+  var bg=active?def.abg:def.ibg,bd=active?def.abd:def.ibd,tx=active?def.atx:def.itx;
+  return 'padding:6px 14px;font-size:12px;border-radius:6px;border:1.5px solid '+bd+
+    ';cursor:pointer;background:'+bg+';color:'+tx+
+    ';font-family:inherit;touch-action:manipulation;font-weight:'+(active?'700':'500')+';min-height:34px;white-space:nowrap;';
+}
+
+(function(){
+  var sb=document.getElementById('scale-btns');
+  SCALE_DEFS.forEach(function(def){
+    var btn=document.createElement('button');
+    btn.style.cssText=bSty(def,def.key==='all');
+    btn.textContent=def.lbl;
+    btn.onclick=function(){setScale(def.key);};
+    sb.appendChild(btn); scaleBtns[def.key]=btn;
+  });
+  var yb=document.getElementById('y-btns');
+  Y_DEFS.forEach(function(def){
+    var btn=document.createElement('button');
+    btn.style.cssText=bSty(def,def.key==='count');
+    btn.textContent=def.lbl;
+    btn.onclick=function(){setY(def.key);};
+    yb.appendChild(btn); yBtns[def.key]=btn;
+  });
+})();
+
+function setScale(s){
+  curScale=s;
+  SCALE_DEFS.forEach(function(def){scaleBtns[def.key].style.cssText=bSty(def,def.key===s);scaleBtns[def.key].textContent=def.lbl;});
+  buildPanels();
+}
+function setY(y){
+  curY=y;
+  Y_DEFS.forEach(function(def){yBtns[def.key].style.cssText=bSty(def,def.key===y);yBtns[def.key].textContent=def.lbl;});
+  Object.keys(charts).forEach(function(k){updateChart(k);});
+}
+
+function visScales(){
+  return curScale==='all'?['NAV','COM','VAC']:[curScale];
+}
+
+function destroyAll(){
+  Object.keys(charts).forEach(function(k){charts[k].destroy();});
+  charts={};
+}
+
+function updateChart(key){
+  var d=DATA[key],ch=charts[key];
+  if(!ch) return;
+  var isC=(curY==='count');
+  ch.data.datasets[0].data=d.rows.map(function(r){return isC?r[1]:r[2];});
+  ch.options.scales.y.title.text=isC?'Number of patterns':'% of all patterns';
+  ch.options.scales.y.ticks.callback=isC
+    ?function(v){return v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v;}
+    :function(v){return v.toFixed(1)+'%';};
+  ch.options.animation.duration=250;
+  ch.update();
+}
+
+var tip=document.getElementById('tip');
+function showTip(e,key,idx){
+  var d=DATA[key],r=d.rows[idx];
+  tip.style.opacity='1';
+  tip.innerHTML='<strong>'+d.label+'</strong><br>'+
+    SCORE_TYPE+' = <strong>'+r[0].toFixed(1)+'</strong><br>'+
+    'Count: <strong>'+r[1].toLocaleString()+'</strong><br>'+
+    'Share: <strong>'+r[2].toFixed(4)+'%</strong> of 4<sup>'+d.n+'</sup>';
+  var tx=e.clientX+14,ty=e.clientY-10;
+  if(tx+245>window.innerWidth) tx=e.clientX-245;
+  if(ty<0) ty=e.clientY+20;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function hideTip(){tip.style.opacity='0';}
+
+function buildPanels(){
+  destroyAll();
+  var wrap=document.getElementById('panels-wrap');
+  var scales=visScales();
+  var cols=scales.length===1?'1fr':scales.length===2?'1fr 1fr':'1fr 1fr 1fr';
+  var h=scales.length===1?'320':'200';
+  wrap.innerHTML='';
+  var grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:'+cols+';gap:20px;';
+  wrap.appendChild(grid);
+
+  scales.forEach(function(key){
+    var d=DATA[key];
+    var maxCnt=Math.max.apply(null,d.rows.map(function(r){return r[1];}));
+    var peakRow=d.rows.reduce(function(a,b){return b[1]>a[1]?b:a;});
+
+    var panel=document.createElement('div');
+    panel.className='panel';
+    panel.innerHTML=
+      '<div class="ptitle" style="color:'+d.col+'">'+d.label+'</div>'+
+      '<div class="psub">'+d.n+' items &middot; 4<sup>'+d.n+'</sup> = '+d.total.toLocaleString()+' patterns &middot; '+d.n_vals+' '+SCORE_TYPE+' values</div>'+
+      '<div class="stat-row">'+
+        '<div class="stat"><div class="sv">'+d.n_vals+'</div><div class="sl">Distinct values</div></div>'+
+        '<div class="stat"><div class="sv">'+peakRow[2].toFixed(1)+'%</div><div class="sl">Peak %</div></div>'+
+        '<div class="stat"><div class="sv">'+peakRow[0].toFixed(1)+'</div><div class="sl">Peak score</div></div>'+
+      '</div>'+
+      '<div style="position:relative;height:'+h+'px;"><canvas id="hc-'+key+'"></canvas></div>'+
+      '<div class="pnote" style="background:'+d.col+'10;border-left:3px solid '+d.col+';">'+d.note+'</div>';
+    grid.appendChild(panel);
+
+    var labels=d.rows.map(function(r){return r[0].toFixed(1);});
+    var vals=d.rows.map(function(r){return r[1];});
+    var bgColors=d.rows.map(function(r){return r[1]===maxCnt?d.col:d.colL;});
+
+    charts[key]=new Chart(document.getElementById('hc-'+key),{
+      type:'bar',
+      data:{labels:labels,datasets:[{
+        data:vals,backgroundColor:bgColors,borderColor:d.col,borderWidth:0.5,
+        hoverBackgroundColor:d.col,barPercentage:0.9,categoryPercentage:1.0
+      }]},
+      options:{
+        animation:{duration:0},responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{enabled:false}},
+        onHover:function(e,els){
+          if(els.length>0){showTip(e.native||e,key,els[0].index);}
+          else{hideTip();}
+        },
+        scales:{
+          x:{ticks:{font:{size:8},maxRotation:45,color:'#aaa',autoSkip:true,maxTicksLimit:11},
+             grid:{display:false},
+             title:{display:true,text:AXIS_LABEL,font:{size:9},color:'#777'}},
+          y:{ticks:{font:{size:8},color:'#aaa',
+               callback:function(v){return v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v;}},
+             grid:{color:'#f0f0f0'},
+             title:{display:true,text:'Number of patterns',font:{size:9},color:'#777'}}
+        }
+      }
+    });
+  });
+}
+
+buildPanels();
+</script>
+</body>
+</html>
