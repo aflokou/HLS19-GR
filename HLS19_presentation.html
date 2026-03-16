@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — Presentation</title>
+<style>
+:root {
+  --dark: #042C53;
+  --mid:  #185FA5;
+  --light: #B5D4F4;
+  --accent: #1D9E75;
+  --warn: #EF9F27;
+  --danger: #A32D2D;
+  --bg: #f4f6f9;
+  --white: #ffffff;
+  --text: #1a2332;
+  --muted: #6b7a90;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background: #000; }
+
+/* ── DECK ── */
+#deck { width: 100vw; height: 100vh; position: relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column;
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.slide.active { display: flex; opacity: 1; }
+
+/* ── NAVIGATION ── */
+#nav {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px; z-index: 1000;
+  background: rgba(4,44,83,0.85); border-radius: 30px; padding: 8px 18px;
+  backdrop-filter: blur(8px);
+}
+.nav-btn {
+  background: none; border: 1px solid rgba(255,255,255,0.3); color: #fff;
+  border-radius: 50%; width: 34px; height: 34px; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; touch-action: manipulation;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.2); }
+#slide-counter { color: rgba(255,255,255,0.7); font-size: 12px; min-width: 48px; text-align: center; }
+
+/* ── PROGRESS ── */
+#progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); transition: width 0.3s ease; z-index: 1000; }
+
+/* ── FULLSCREEN BTN ── */
+#fsBtn {
+  position: fixed; top: 14px; right: 14px; z-index: 1000;
+  background: rgba(4,44,83,0.7); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; border-radius: 8px; padding: 6px 12px; font-size: 11px;
+  cursor: pointer; backdrop-filter: blur(4px); touch-action: manipulation;
+}
+
+/* ═══════════════════════════════
+   SLIDE TYPES
+═══════════════════════════════ */
+
+/* TITLE SLIDE */
+.s-title {
+  background: var(--dark);
+  justify-content: center; align-items: flex-start; padding: 60px 80px;
+}
+.s-title .pre-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 20px;
+}
+.s-title h1 {
+  font-size: clamp(26px, 3.5vw, 44px); font-weight: 700; color: #fff;
+  line-height: 1.25; max-width: 820px; margin-bottom: 24px;
+}
+.s-title .authors {
+  font-size: 15px; color: var(--light); margin-bottom: 8px;
+}
+.s-title .affil {
+  font-size: 12px; color: rgba(181,212,244,0.6); margin-bottom: 32px; max-width: 700px; line-height: 1.6;
+}
+.s-title .journal-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 8px 16px; font-size: 12px; color: var(--light);
+}
+.s-title .doi { font-size: 11px; color: rgba(181,212,244,0.5); margin-top: 12px; }
+
+/* SECTION HEADER */
+.s-section {
+  background: var(--mid);
+  justify-content: center; align-items: center; text-align: center;
+}
+.s-section .sec-num {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 14px;
+}
+.s-section h2 { font-size: clamp(28px, 4vw, 52px); font-weight: 700; color: #fff; max-width: 700px; line-height: 1.2; }
+
+/* CONTENT SLIDE — light */
+.s-content {
+  background: var(--bg);
+  padding: 0;
+}
+.slide-header {
+  background: var(--dark); color: #fff;
+  padding: 18px 48px; flex-shrink: 0;
+}
+.slide-header h2 { font-size: 18px; font-weight: 600; }
+.slide-header .sh-sub { font-size: 12px; color: var(--light); margin-top: 3px; }
+.slide-body {
+  flex: 1; padding: 28px 48px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* CONTENT SLIDE — dark */
+.s-dark {
+  background: #0a1929;
+}
+.s-dark .slide-header { background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
+.s-dark .slide-header h2 { color: #fff; }
+.s-dark .slide-body { color: #c8d8ea; }
+
+/* CARDS */
+.card-grid { display: grid; gap: 14px; }
+.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card {
+  background: var(--white); border-radius: 10px;
+  border: 1px solid #dde5f0; padding: 16px 20px;
+}
+.s-dark .card { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+.card-icon { font-size: 22px; margin-bottom: 8px; }
+.card h3 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.s-dark .card h3 { color: var(--light); }
+.card p, .card li { font-size: 12px; color: #555; line-height: 1.65; }
+.s-dark .card p, .s-dark .card li { color: #9ab4cc; }
+.card ul { padding-left: 16px; }
+.card li { margin-bottom: 3px; }
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--white); border-radius: 10px; border: 1px solid #dde5f0;
+  padding: 18px; text-align: center;
+}
+.stat-card .sv { font-size: 32px; font-weight: 800; color: var(--dark); line-height: 1; margin-bottom: 6px; }
+.stat-card .sl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.stat-card.green .sv  { color: #1D9E75; }
+.stat-card.amber .sv  { color: #BA7517; }
+.stat-card.red .sv    { color: var(--danger); }
+.stat-card.blue .sv   { color: var(--mid); }
+
+/* HIGHLIGHT BOX */
+.hbox {
+  border-radius: 10px; padding: 14px 18px; font-size: 13px; line-height: 1.7;
+}
+.hbox.blue  { background: rgba(24,95,165,0.08); border-left: 4px solid var(--mid); color: var(--dark); }
+.hbox.green { background: rgba(29,158,117,0.08); border-left: 4px solid var(--accent); color: #0a3d2b; }
+.hbox.amber { background: rgba(239,159,39,0.1);  border-left: 4px solid var(--warn);   color: #5a3a00; }
+.hbox.red   { background: rgba(163,45,45,0.08);  border-left: 4px solid var(--danger); color: #5a1010; }
+.s-dark .hbox.blue  { background: rgba(24,95,165,0.2);  color: var(--light); }
+.s-dark .hbox.green { background: rgba(29,158,117,0.15); color: #9FE1CB; }
+.s-dark .hbox.amber { background: rgba(239,159,39,0.15); color: #FAC775; }
+.s-dark .hbox.red   { background: rgba(163,45,45,0.15);  color: #F09595; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.data-table th { background: var(--dark); color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; }
+.data-table td { padding: 7px 10px; border-bottom: 1px solid #eaeff5; color: #333; }
+.data-table tr:nth-child(even) td { background: #f7f9fc; }
+.data-table .val { font-weight: 700; color: var(--mid); }
+
+/* IFRAME SLIDE */
+.s-iframe { background: #fff; flex-direction: column; }
+.s-iframe .iframe-header {
+  background: var(--dark); color: #fff; padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.s-iframe .iframe-header h2 { font-size: 15px; font-weight: 600; }
+.s-iframe .iframe-header span { font-size: 11px; color: var(--light); }
+.s-iframe iframe { flex: 1; border: none; width: 100%; }
+
+/* PILL */
+.pill {
+  display: inline-block; padding: 2px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; vertical-align: middle; margin: 0 2px;
+}
+.pill.green { background: rgba(29,158,117,0.15); color: #0a5c3e; }
+.pill.amber { background: rgba(239,159,39,0.2);  color: #7a4d00; }
+.pill.red   { background: rgba(163,45,45,0.15);  color: #6b1010; }
+.pill.blue  { background: rgba(24,95,165,0.12);  color: #0c3468; }
+
+/* TWO-COL LAYOUT */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* STEP LIST */
+.step-list { display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--mid);
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 12.5px; color: #444; line-height: 1.6; }
+.step-text strong { color: var(--dark); }
+
+/* CONCLUSION SLIDE */
+.s-conclusion { background: var(--dark); justify-content: center; padding: 50px 70px; }
+.s-conclusion h2 { font-size: 26px; color: #fff; font-weight: 700; margin-bottom: 24px; }
+.concl-list { display: flex; flex-direction: column; gap: 12px; }
+.concl-item { display: flex; gap: 14px; align-items: flex-start; }
+.concl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+.concl-text { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.65; }
+.concl-text strong { color: #fff; }
+
+@media (max-width: 700px) {
+  .card-grid.cols-2, .card-grid.cols-3, .two-col, .three-col { grid-template-columns: 1fr; }
+  .s-title { padding: 40px 28px; }
+  .slide-body { padding: 18px 20px; }
+  .slide-header { padding: 14px 20px; }
+  .s-conclusion { padding: 30px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<button id="fsBtn" onclick="toggleFS()">⛶ Fullscreen</button>
+
+<div id="deck">
+
+<!-- ══════════════════════════════════
+  SLIDE 1 — TITLE
+══════════════════════════════════ -->
+<div class="slide s-title active">
+  <div class="pre-label">Brief Report · Healthcare 2025, 13, 2541</div>
+  <h1>The Greek Versions of the HLS<sub style="font-size:0.65em">19</sub> Health Literacy Instruments</h1>
+  <div class="authors">Angeliki Flokou &nbsp;·&nbsp; Panagiotis Theodorou &nbsp;·&nbsp; Dimitris A. Niakas &nbsp;·&nbsp; Petros Kostagiolas</div>
+  <div class="affil">
+    Ionian University, Dept. of Archives, Library Science &amp; Museology, Corfu &nbsp;|&nbsp;
+    Hellenic Open University, School of Social Sciences, Patra &nbsp;|&nbsp;
+    National &amp; Kapodistrian University of Athens, Medical School
+  </div>
+  <div class="journal-badge">
+    <span style="color:#1D9E75;font-weight:700;">healthcare</span>
+    <span>Impact Factor 2.7 &nbsp;·&nbsp; MDPI Open Access &nbsp;·&nbsp; PubMed Indexed</span>
+  </div>
+  <div class="doi">https://doi.org/10.3390/healthcare13192541</div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 2 — SECTION: BACKGROUND
+══════════════════════════════════ -->
+<div class="slide s-section">
+  <div class="sec-num">01 · Background</div>
+  <h2>Why health literacy matters — and why Greece needed these instruments</h2>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 3 — BACKGROUND
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Health Literacy: Definition &amp; Policy Context</h2>
+    <div class="sh-sub">WHO framework · HLS-EU · M-POHL</div>
+  </div>
+  <div class="slide-body">
+    <div class="hbox blue">
+      <strong>WHO definition:</strong> "The personal knowledge and competencies that accumulate through daily activities, social interactions, and across generations" — enabling access, understanding, appraisal, and use of health information.
+    </div>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <div class="card-icon">⚠️</div>
+        <h3>Consequences of low health literacy</h3>
+        <ul>
+          <li>Higher hospitalization &amp; emergency use</li>
+          <li>Lower uptake of preventive care</li>
+          <li>Worse health status &amp; higher mortality</li>
+          <li>Longer hospital stays &amp; increased costs</li>
+          <li>Disproportionate burden on vulnerable groups</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <h3>Policy milestones</h3>
+        <ul>
+          <li><strong>HLS-EU (2009–2012)</strong> — first cross-national benchmark; Greece participated</li>
+          <li><strong>WHO Shanghai Declaration (2016)</strong> — HL central to SDG 2030</li>
+          <li><strong>M-POHL (2018)</strong> — WHO Action Network for comparable HL data</li>
+          <li><strong>HLS19 (2019–2021)</strong> — 17 countries; Greece did <em>not</em> participate</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <strong>The gap:</strong> Despite growing political and scientific interest, Greece had no validated Greek versions of the HLS19 domain-specific instruments. This study addresses that gap.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 4 — THE THREE INSTRUMENTS
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>The Three HLS19 Instruments</h2>
+    <div class="sh-sub">NAV · COM · VAC — domain-specific health literacy</div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-3">
+      <div class="card" style="border-top: 3px solid #185FA5;">
+        <h3 style="color:#185FA5;">HLS19-NAV-GR</h3>
+        <p><strong>Navigational HL</strong></p>
+        <p style="margin-top:6px;">12 items across macro (system), meso (organizational), and micro (interpersonal) levels. Assesses ability to access, understand, appraise, and apply information to navigate the healthcare system.</p>
+      </div>
+      <div class="card" style="border-top: 3px solid #1D9E75;">
+        <h3 style="color:#1D9E75;">HLS19-COM-GR</h3>
+        <p><strong>Communicative HL</strong></p>
+        <p style="margin-top:6px;">11 items. Evaluates patients' communication and social skills when interacting with physicians — from describing symptoms to being involved in shared decision-making.</p>
+      </div>
+      <div class="card" style="border-top: 3px solid #BA7517;">
+        <h3 style="color:#BA7517;">HLS19-VAC-GR</h3>
+        <p><strong>Vaccination HL</strong></p>
+        <p style="margin-top:6px;">4 items. Captures perceived ability to find, understand, judge, and decide about vaccination-related information for oneself and family.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Common item stem &amp; response scale</h3>
+      <p style="margin-top:6px;font-style:italic;color:#185FA5;">"On a scale from very easy to very difficult, how easy would you say it is…"</p>
+      <p style="margin-top:8px;">All items rated on a 4-point Likert scale: <span class="pill red">1 Very Difficult</span> <span class="pill amber">2 Difficult</span> <span class="pill blue">3 Easy</span> <span class="pill green">4 Very Easy</span>. Higher values = greater HL. Two scoring schemes: <strong>P-type</strong> (mean, 0–100) and <strong>D-type</strong> (% of Easy/Very Easy responses, 0–100).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 5 — SECTION: METHODS
+══════════════════════════════════ -->
+<div class="slide s-section">
+  <div class="sec-num">02 · Methods</div>
+  <h2>Translation, cultural adaptation &amp; pilot field test</h2>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 6 — METHODS
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Adaptation &amp; Field Testing Protocol</h2>
+    <div class="sh-sub">M-POHL guidelines · Dual forward/back-translation · N = 71</div>
+  </div>
+  <div class="slide-body">
+    <div class="two-col">
+      <div>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Permission</strong> — obtained from M-POHL / WHO Action Network (Dec 2024)</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Dual forward translation</strong> — two independent translators, English → Greek; reconciled into single draft</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Back-translation</strong> — third translator (blind), Greek → English; conceptual equivalence checked</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Expert review</strong> — 11-member panel (healthcare professionals &amp; academics); written comments compiled</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Field test</strong> — N = 71, quota-guided telephone interviews; 4 NUTS-1 Greek regions</div></div>
+          <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Test–retest</strong> — n = 16, ~12-day interval, ICC(2,1) as primary stability measure</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="border-top:3px solid var(--mid);">
+          <h3>Sample (N = 71)</h3>
+          <p>Purposive, quota-guided non-probability sampling approximating Greek population by <strong>sex, age, education</strong> and <strong>geographic region</strong> (EL3 Attica · EL4 Aegean/Crete · EL5 Northern · EL6 Central Greece). Exceeds M-POHL minimum of &gt;30.</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent);">
+          <h3>Reliability analyses</h3>
+          <p>Cronbach's α &amp; ordinal α (polychoric/tetrachoric matrices); corrected item–total correlations (polyserial/point-biserial); mean inter-item correlations. Both polytomous (4-point) and dichotomous (0/1) coding examined.</p>
+        </div>
+        <div class="hbox blue" style="font-size:12px;">
+          <strong>Ethics:</strong> Research Ethics Committee, Ionian University (protocol [8813/8814/8815], 27 May 2025). GDPR-compliant; verbal informed consent.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 7 — KEY ADAPTATIONS
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Key Translation &amp; Cultural Adaptations</h2>
+    <div class="sh-sub">NAV required most work · COM and VAC minimal changes</div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-2">
+      <div class="card" style="border-top:3px solid var(--mid);">
+        <h3>HLS19-NAV-GR — 6 issues resolved</h3>
+        <ul style="margin-top:8px;">
+          <li><strong>NAV2, NAV3, NAV8:</strong> "to judge" → «να κρίνετε» / «να εκτιμήσετε» (context-dependent)</li>
+          <li><strong>NAV2:</strong> Added clarifying examples (GP, specialist, hospital, health center)</li>
+          <li><strong>NAV4:</strong> "ongoing reforms" → «µεταρρυθµίσεις υγείας που βρίσκονται σε εξέλιξη»</li>
+          <li><strong>NAV12:</strong> "stand up for yourself" → «να υπερασπιστείτε τα δικαιώµατά σας» — aligned with Law 4368/2016 (patient rights offices)</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent);">
+        <h3>HLS19-COM-GR &amp; HLS19-VAC-GR</h3>
+        <p style="margin-top:6px;">COM required <strong>no adjustments</strong>. VAC required one minor change:</p>
+        <ul style="margin-top:8px;">
+          <li><strong>VAC3:</strong> "to judge" → «να κρίνετε» (same solution as NAV)</li>
+        </ul>
+        <div class="hbox green" style="margin-top:10px;font-size:11.5px;">
+          The workflow proved its value: expert panel identified most issues; field test confirmed and revealed additional ones (NAV2 examples). Similar wording challenges noted in other HLS19 adaptations for appraisal verbs and broad system terms.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Completion times</h3>
+      <div class="three-col" style="margin-top:10px;">
+        <div class="stat-card blue"><div class="sv">~4 min</div><div class="sl">HLS19-NAV-GR<br>(range 2–9 min)</div></div>
+        <div class="stat-card blue"><div class="sv">~3 min</div><div class="sl">HLS19-COM-GR<br>(range 2–8 min)</div></div>
+        <div class="stat-card blue"><div class="sv">~1 min</div><div class="sl">HLS19-VAC-GR<br>(range 0.5–3 min)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 8 — SECTION: RESULTS
+══════════════════════════════════ -->
+<div class="slide s-section">
+  <div class="sec-num">03 · Results</div>
+  <h2>Reliability, item distributions &amp; scale scores</h2>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 9 — TEST-RETEST & RELIABILITY
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Test–Retest Stability &amp; Internal Consistency</h2>
+    <div class="sh-sub">ICC(2,1) primary · Cronbach's α &amp; ordinal α · N = 71, n = 16</div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-3">
+      <div class="stat-card green"><div class="sv">0.91–0.93</div><div class="sl">ICC(2,1) across scales<br><em>"Excellent"</em> (&gt;0.90)</div></div>
+      <div class="stat-card green"><div class="sv">0.94–0.95</div><div class="sl">Ordinal α (polytomous)<br>All scales well above 0.70</div></div>
+      <div class="stat-card green"><div class="sv">0.92–0.94</div><div class="sl">Ordinal α (dichotomous)<br>Consistent across coding</div></div>
+    </div>
+    <div class="card">
+      <h3>Reliability summary by scale</h3>
+      <table class="data-table" style="margin-top:8px;">
+        <thead>
+          <tr><th>Scale</th><th>Cronbach α (P)</th><th>Ordinal α (P)</th><th>Cronbach α (D)</th><th>Ordinal α (D)</th><th>ICC (2,1)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>NAV-GR</strong></td><td class="val">0.94</td><td class="val">0.95</td><td class="val">0.89</td><td class="val">0.94</td><td class="val">0.91</td></tr>
+          <tr><td><strong>COM-GR</strong></td><td class="val">0.91</td><td class="val">0.94</td><td class="val">0.84</td><td class="val">0.93</td><td class="val">0.93</td></tr>
+          <tr><td><strong>VAC-GR</strong></td><td class="val">0.85</td><td class="val">0.91</td><td class="val">0.79</td><td class="val">0.92</td><td class="val">0.91</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-grid cols-2">
+      <div class="hbox green">
+        <strong>No item undermined reliability</strong> — "alpha if item deleted" showed no item whose removal would increase Cronbach's or ordinal α.
+      </div>
+      <div class="hbox amber">
+        <strong>Notable exception:</strong> NAV8–NAV9 pair had the lowest inter-item correlation (0.08 dichotomous), suggesting different HL facets (scheduling/logistics vs. appraisal) rather than item failure.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 10 — FIGURE 1 INTERACTIVE
+══════════════════════════════════ -->
+<div class="slide s-iframe">
+  <div class="iframe-header">
+    <h2>Figure 1 — Item-level Response Distributions</h2>
+    <span>Use tabs to switch scale · Hover/tap bars for details · Sort by Easy%</span>
+  </div>
+  <iframe src="HLS19_Figure1_interactive.html" title="Figure 1"></iframe>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 11 — ITEM HIGHLIGHTS
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Item-level Highlights</h2>
+    <div class="sh-sub">Key patterns from Figure 1 — NAV · COM · VAC</div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-3">
+      <div class="card" style="border-top:3px solid var(--mid);">
+        <h3 style="color:var(--mid);">NAV — balanced profile</h3>
+        <p>Nearly symmetric 50/50 difficulty–ease split overall. <strong>NAV9</strong> ("getting an appointment") easiest at 67.6% Easy+. <strong>NAV4</strong> ("understanding healthcare reforms") hardest at 32.4% Easy+. Rank correlation with international HLS19 results: ρ = 0.73.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent);">
+        <h3 style="color:var(--accent);">COM — generally easy, one outlier</h3>
+        <p>Mean Easy+ = 72.7% — patients find communication relatively easy. <strong>COM1</strong> ("describing reasons for consultation") highest at 90.1%. <strong>COM4</strong> ("getting enough time") stands out at only 41%, reflecting Greece's short consultations (~10–15 min; 65% report insufficient time). ρ = 0.76 vs international.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--warn);">
+        <h3 style="color:#BA7517;">VAC — ceiling effect</h3>
+        <p>All 4 items show Easy+ &gt; 70%. <strong>VAC2</strong> ("understanding why vaccinations are needed") highest at 85.9%. This ceiling limits upper-range discrimination and responsiveness to change — future validation should consider harder items or expanded item pool.</p>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <strong>APRP comparison:</strong> NAV (10–41–36–13%) closely matches Belgium (12–40–38–11%). COM (3–25–51–21%) resembles Germany (3–23–53–20%). VAC (1–21–46–32%) is similar to Norway (3–19–44–34%).
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 12 — FIGURE 2 INTERACTIVE
+══════════════════════════════════ -->
+<div class="slide s-iframe">
+  <div class="iframe-header">
+    <h2>Figure 2 — Score Distributions: P-type &amp; D-type</h2>
+    <span>Switch scale with tabs · Histogram + aligned box plot · Hover bars for frequency</span>
+  </div>
+  <iframe src="HLS19_Figure2_interactive.html" title="Figure 2"></iframe>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 13 — SCALE SCORES
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Scale-level Score Distributions</h2>
+    <div class="sh-sub">P-type &amp; D-type · 0–100 · Descending order: VAC &gt; COM &gt; NAV</div>
+  </div>
+  <div class="slide-body">
+    <div class="card">
+      <h3>Descriptive statistics — P-type (polytomous) scoring</h3>
+      <table class="data-table" style="margin-top:8px;">
+        <thead>
+          <tr><th>Scale</th><th>Mean</th><th>Median</th><th>SD</th><th>IQR</th><th>Skewness</th><th>Range</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>NAV-GR</strong></td><td class="val">51.1</td><td>50.0</td><td>21.1</td><td>25.0</td><td>+0.32</td><td>0–100</td></tr>
+          <tr><td><strong>COM-GR</strong></td><td class="val">63.6</td><td>63.6</td><td>17.2</td><td>15.2</td><td>+0.14</td><td>15–100</td></tr>
+          <tr><td><strong>VAC-GR</strong></td><td class="val">69.8</td><td>66.7</td><td>20.4</td><td>29.2</td><td>−0.12</td><td>33–100</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h3>Inter-scale correlations (Pearson r)</h3>
+        <table class="data-table" style="margin-top:8px;">
+          <thead><tr><th></th><th>HLS19-Q12-GR</th><th>NAV</th><th>COM</th></tr></thead>
+          <tbody>
+            <tr><td><strong>NAV</strong></td><td class="val">0.63</td><td>—</td><td>—</td></tr>
+            <tr><td><strong>COM</strong></td><td class="val">0.52</td><td class="val">0.64</td><td>—</td></tr>
+            <tr><td><strong>VAC</strong></td><td class="val">0.58</td><td class="val">0.47</td><td class="val">0.59</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="hbox green">
+          All inter-scale correlations <strong>0.40–0.70</strong> — within the discriminant validity range; scales are related but measure distinct constructs.
+        </div>
+        <div class="hbox blue">
+          P-type correlations with HLS19-Q12-GR match international averages (~0.60, 0.52, 0.60). D-type NAV and VAC also align closely with published country-level results.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 14 — TABLE S7 INTERACTIVE
+══════════════════════════════════ -->
+<div class="slide s-iframe">
+  <div class="iframe-header">
+    <h2>Supplementary Table S7 — P-type → D-type Score Transitions (VAC)</h2>
+    <span>Click/tap cells to highlight · Filter by transition type · 256 theoretical patterns</span>
+  </div>
+  <iframe src="HLS19_TableS7_interactive.html" title="Table S7"></iframe>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 15 — DISCUSSION HIGHLIGHTS
+══════════════════════════════════ -->
+<div class="slide s-content">
+  <div class="slide-header">
+    <h2>Discussion — Key Observations</h2>
+    <div class="sh-sub">NAV9 · COM4 · VAC ceiling · Methodological note</div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-2">
+      <div class="card" style="border-top:3px solid var(--mid);">
+        <h3>NAV9 — scheduling facet</h3>
+        <p>"Understand how to get an appointment" showed lowest mean inter-item correlations but adequate item–total r. Consistent with cross-country HLS19-NAV evidence (8 countries): NAV9 repeatedly flagged for weaker fit and DIF, suggesting sensitivity to healthcare system context (access, scheduling) beyond individual HL skill.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--warn);">
+        <h3>COM4 — system-level barrier</h3>
+        <p>"Get enough time in consultation" was the hardest COM item (41% Easy+). In Greece, consultations average 10–15 min; only 24% of patients with ≥2 chronic conditions receive &gt;15 min (vs. OECD PaRIS average 47%). COM4 responses may partly reflect system capacity rather than communicative HL.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--danger);">
+        <h3>VAC ceiling effect</h3>
+        <p>All VAC items cluster in Easy/Very Easy (71–86%). D-type VAC median = 100. This limits responsiveness to true improvements and discriminative ability at the upper end — consistent with HLS19 Consortium findings across 11 countries, who recommend harder items and an expanded item pool.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #888;">
+        <h3>Methodological note</h3>
+        <p>This is a <strong>translation, adaptation and field-testing study</strong>, not a full validation. N = 71 was designed for feasibility and item performance signals. Complete structural analyses (EFA/CFA, Rasch, DIF) are reserved for the upcoming national survey (N &gt; 1000), excluding field-test participants.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+  SLIDE 16 — CONCLUSIONS
+══════════════════════════════════ -->
+<div class="slide s-conclusion">
+  <h2>Conclusions &amp; Next Steps</h2>
+  <div class="concl-list">
+    <div class="concl-item"><div class="concl-dot"></div><div class="concl-text">The <strong>HLS19-NAV-GR, HLS19-COM-GR, and HLS19-VAC-GR</strong> are linguistically and culturally appropriate for the Greek population and operationally feasible (short completion times, minimal missing data).</div></div>
+    <div class="concl-item"><div class="concl-dot"></div><div class="concl-text"><strong>High internal consistency</strong> (ordinal α 0.91–0.95) and <strong>excellent short-term stability</strong> (ICC 0.91–0.93) under both polytomous and dichotomous coding. No item undermined reliability.</div></div>
+    <div class="concl-item"><div class="concl-dot"></div><div class="concl-text"><strong>Three priorities flagged</strong> for national validation: NAV9 (logistics facet), COM4 (system time constraints), VAC ceiling (need for harder items).</div></div>
+    <div class="concl-item"><div class="concl-dot"></div><div class="concl-text"><strong>National validation study</strong> (N &gt; 1000) is prepared: Rasch/PCM, CFA, measurement invariance, DIF testing — with potential to benchmark Greek population HL and monitor policy reforms.</div></div>
+    <div class="concl-item"><div class="concl-dot"></div><div class="concl-text">Instruments can <strong>inform policy</strong>: navigation support programs, clinician communication training, vaccination literacy outreach, and lifelong learning for healthcare professionals.</div></div>
+  </div>
+</div>
+
+</div><!-- end #deck -->
+
+<!-- NAVIGATION -->
+<div id="nav">
+  <button class="nav-btn" onclick="go(-1)">&#8592;</button>
+  <span id="slide-counter">1 / 16</span>
+  <button class="nav-btn" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+var slides = document.querySelectorAll('.slide');
+var total  = slides.length;
+var cur    = 0;
+
+function go(dir) {
+  slides[cur].classList.remove('active');
+  cur = (cur + dir + total) % total;
+  slides[cur].classList.add('active');
+  document.getElementById('slide-counter').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     go(-1);
+});
+
+// Swipe
+var tx0, ty0;
+document.addEventListener('touchstart', function(e) { tx0=e.touches[0].clientX; ty0=e.touches[0].clientY; }, {passive:true});
+document.addEventListener('touchend',   function(e) {
+  var dx = e.changedTouches[0].clientX - tx0;
+  var dy = e.changedTouches[0].clientY - ty0;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+}, {passive:true});
+
+function toggleFS() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+// Init progress
+document.getElementById('progress').style.width = (1/total*100) + '%';
+</script>
+</body>
+</html>
