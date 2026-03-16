@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — Figure 1</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+header { background: #042C53; color: #fff; padding: 28px 40px 20px; }
+header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+header p  { font-size: 13px; color: #B5D4F4; }
+.container { max-width: 1100px; margin: 0 auto; padding: 28px 32px; }
+.card { background: #fff; border: 1px solid #e0e5ec; border-radius: 12px; padding: 24px 28px 20px; }
+footer { text-align: center; font-size: 11px; color: #aaa; padding: 20px 0 30px; }
+#tip { position: fixed; background: #fff; border: 1px solid #dde3ec; border-radius: 8px; padding: 9px 13px;
+  font-size: 12px; line-height: 1.7; pointer-events: none; opacity: 0; transition: opacity 0.1s;
+  max-width: 260px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 200; color: #333; }
+@media (max-width: 600px) { header { padding: 20px; } .container { padding: 16px; } .card { padding: 16px 14px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>HLS<sub>19</sub> Greek Versions &mdash; Figure 1</h1>
+  <p>Item-level response distributions &middot; Figure 1 &middot; Flokou et al., <em>Healthcare</em> 2025 &middot; N=71</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="tabs"></div>
+    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:12px;" id="sort-area">
+      <span style="font-size:11px;color:#888;flex-shrink:0;">Sort:</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;font-size:12px;color:#555;" id="legend"></div>
+    <div id="chart"></div>
+    <div style="display:flex;margin-top:4px;">
+      <div style="width:56px;flex-shrink:0;"></div>
+      <div style="flex:1;display:flex;justify-content:space-between;font-size:10px;color:#bbb;">
+        <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+      </div>
+      <div style="width:38px;text-align:right;font-size:9px;color:#bbb;padding-left:5px;">3+4</div>
+    </div>
+    <p style="font-size:11px;color:#aaa;margin-top:12px;line-height:1.6;">Click or tap any bar segment for details. Click the same sort button again to toggle ascending/descending order.</p>
+  </div>
+</div>
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025)</footer>
+<div id="tip"></div>
+
+<script>
+var C = ['#A32D2D','#EF9F27','#85B7EB','#185FA5'];
+var CLBL=["Very difficult", "Difficult", "Easy", "Very easy"];
+var TIP_EASY="Cat. 3+4:";
+var SCALES={"NAV": {"items": ["NAV1", "NAV2", "NAV3", "NAV4", "NAV5", "NAV6", "NAV7", "NAV8", "NAV9", "NAV10", "NAV11", "NAV12"], "vals": {"NAV1": [4.2, 35.2, 45.1, 15.5], "NAV2": [2.8, 33.8, 52.1, 11.3], "NAV3": [8.5, 45.0, 32.4, 14.1], "NAV4": [15.5, 52.1, 22.5, 9.9], "NAV5": [9.9, 54.9, 23.9, 11.3], "NAV6": [7.0, 43.7, 33.8, 15.5], "NAV7": [11.3, 45.0, 32.4, 11.3], "NAV8": [8.5, 36.6, 35.2, 19.7], "NAV9": [7.0, 25.4, 49.3, 18.3], "NAV10": [7.0, 46.5, 36.6, 9.9], "NAV11": [8.5, 38.0, 43.6, 9.9], "NAV12": [23.9, 35.2, 28.2, 12.7]}, "desc": {"NAV1": "Understand how the health care system works", "NAV2": "Judge which type of health service you need", "NAV3": "Judge if insurance covers a health service", "NAV4": "Understand info on ongoing health care reforms", "NAV5": "Find out about your rights as a patient", "NAV6": "Decide for a particular health service", "NAV7": "Find information on quality of a health service", "NAV8": "Judge if a service meets your expectations", "NAV9": "Understand how to get an appointment", "NAV10": "Find out about support options in the system", "NAV11": "Locate the right contact person in a health institution", "NAV12": "Stand up for yourself if care does not meet needs"}}, "COM": {"items": ["COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10", "COM11"], "vals": {"COM1": [0.0, 9.9, 47.8, 42.3], "COM2": [2.8, 25.4, 57.7, 14.1], "COM3": [0.0, 21.1, 55.0, 23.9], "COM4": [7.0, 52.1, 32.4, 8.5], "COM5": [4.2, 32.4, 49.3, 14.1], "COM6": [1.4, 19.7, 63.4, 15.5], "COM7": [4.2, 19.7, 50.7, 25.4], "COM8": [0.0, 16.9, 59.2, 23.9], "COM9": [2.8, 35.2, 46.5, 15.5], "COM10": [4.2, 26.8, 50.7, 18.3], "COM11": [2.9, 11.4, 58.6, 27.1]}, "desc": {"COM1": "Describe your reasons for the consultation", "COM2": "Make your doctor listen without being interrupted", "COM3": "Explain your health concerns to your doctor", "COM4": "Get enough time in the consultation", "COM5": "Express your personal views and preferences", "COM6": "Get the information you need from your doctor", "COM7": "Understand the words used by your doctor", "COM8": "Ask your doctor questions in the consultation", "COM9": "Be involved in decisions about your health", "COM10": "Recall the information you get from your doctor", "COM11": "Use the information from your doctor for your health"}}, "VAC": {"items": ["VAC1", "VAC2", "VAC3", "VAC4"], "vals": {"VAC1": [1.4, 26.8, 47.9, 23.9], "VAC2": [0.0, 14.1, 54.9, 31.0], "VAC3": [0.0, 23.9, 45.1, 31.0], "VAC4": [1.4, 18.3, 39.4, 40.9]}, "desc": {"VAC1": "Find information on recommended vaccinations", "VAC2": "Understand why you/family may need vaccinations", "VAC3": "Judge which vaccinations you/family may need", "VAC4": "Decide if you should have a flu vaccination"}}, "APRP": {"items": ["VAC", "COM", "NAV"], "vals": {"VAC": [1, 21, 46, 32], "COM": [3, 25, 51, 21], "NAV": [10, 41, 36, 13]}, "desc": {"VAC": "HLS19-VAC-GR scale mean", "COM": "HLS19-COM-GR scale mean", "NAV": "HLS19-NAV-GR scale mean"}}};
+var TABS=[{"key": "NAV", "lbl": "HLS19-NAV-GR"}, {"key": "COM", "lbl": "HLS19-COM-GR"}, {"key": "VAC", "lbl": "HLS19-VAC-GR"}, {"key": "APRP", "lbl": "APRP means"}];
+var SORTBTNS=[{key:"orig",lbl:"Original order",ibg:"#f0fdf8",ibd:"#1D9E75",itx:"#1D9E75",abg:"#1D9E75",abd:"#1D9E75",atx:"#fff"},{key:"cat1",lbl:"Cat. 1",ibg:"#fdf0f0",ibd:"#A32D2D",itx:"#A32D2D",abg:"#A32D2D",abd:"#A32D2D",atx:"#fff"},{key:"cat2",lbl:"Cat. 2",ibg:"#fff8ec",ibd:"#EF9F27",itx:"#9A6000",abg:"#EF9F27",abd:"#EF9F27",atx:"#fff"},{key:"cat3",lbl:"Cat. 3",ibg:"#eaf2fc",ibd:"#85B7EB",itx:"#0C447C",abg:"#85B7EB",abd:"#85B7EB",atx:"#042C53"},{key:"cat4",lbl:"Cat. 4",ibg:"#e6f1fb",ibd:"#185FA5",itx:"#185FA5",abg:"#185FA5",abd:"#185FA5",atx:"#fff"},{key:"cat12",lbl:"1 + 2",ibg:"#fdf4f0",ibd:"#C05828",itx:"#C05828",abg:"#C05828",abd:"#C05828",atx:"#fff"},{key:"cat34",lbl:"3 + 4",ibg:"#eaf4fc",ibd:"#4A87B0",itx:"#4A87B0",abg:"#4A87B0",abd:"#4A87B0",atx:"#fff"}];
+
+var current='NAV', sortKey='orig';
+var sortDir={cat1:'desc',cat2:'desc',cat3:'desc',cat4:'desc',cat12:'desc',cat34:'desc'};
+var tabEls={}, sbEls={};
+
+function tabSty(active){
+  if(active) return 'padding:7px 16px;font-size:13px;border-radius:7px;border:1px solid #042C53;cursor:pointer;background:#042C53;color:#fff;font-family:inherit;touch-action:manipulation;font-weight:500;min-height:38px;';
+  return 'padding:7px 16px;font-size:13px;border-radius:7px;border:1px solid #bbb;cursor:pointer;background:#fff;color:#555;font-family:inherit;touch-action:manipulation;min-height:38px;';
+}
+function sbSty(b,active){
+  var bg=active?b.abg:b.ibg,bd=active?b.abd:b.ibd,tx=active?b.atx:b.itx;
+  var op=(active||b.key==='orig')?'1':'0.55';
+  return 'padding:6px 13px;font-size:12px;border-radius:6px;border:1.5px solid '+bd+
+    ';cursor:pointer;background:'+bg+';color:'+tx+
+    ';font-family:inherit;touch-action:manipulation;min-height:32px;white-space:nowrap;'+
+    'font-weight:500;opacity:'+op+';display:inline-flex;align-items:center;gap:3px;';
+}
+
+(function(){
+  var lg=document.getElementById('legend');
+  C.forEach(function(col,i){
+    var s=document.createElement('span');
+    s.style.cssText='display:flex;align-items:center;gap:6px;';
+    s.innerHTML='<span style="width:13px;height:13px;border-radius:2px;display:inline-block;background:'+col+'"></span>'+CLBL[i];
+    lg.appendChild(s);
+  });
+})();
+
+(function(){
+  var c=document.getElementById('tabs');
+  TABS.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.style.cssText=tabSty(t.key==='NAV');
+    btn.textContent=t.lbl;
+    btn.onclick=function(){setScale(t.key);};
+    c.appendChild(btn);
+    tabEls[t.key]=btn;
+  });
+})();
+
+(function(){
+  var area=document.getElementById('sort-area');
+  SORTBTNS.forEach(function(b){
+    var btn=document.createElement('button');
+    btn.style.cssText=sbSty(b,b.key==='orig');
+    btn.textContent=b.lbl;
+    btn.onclick=function(){setSort(b.key);};
+    area.appendChild(btn);
+    sbEls[b.key]=btn;
+  });
+})();
+
+function updateTabs(){
+  TABS.forEach(function(t){
+    tabEls[t.key].style.cssText=tabSty(t.key===current);
+    tabEls[t.key].textContent=t.lbl;
+  });
+}
+function updateSortBtns(){
+  SORTBTNS.forEach(function(b){
+    var active=(b.key===sortKey);
+    sbEls[b.key].style.cssText=sbSty(b,active);
+    var arrow=(b.key!=='orig'&&active)?(sortDir[b.key]==='desc'?' ↓':' ↑'):'';
+    sbEls[b.key].textContent=b.lbl+arrow;
+  });
+}
+function setScale(s){current=s;updateTabs();render();}
+function setSort(key){
+  if(key==='orig'){sortKey='orig';}
+  else{sortDir[key]=(sortKey===key&&sortDir[key]==='desc')?'asc':'desc';sortKey=key;}
+  updateSortBtns();render();
+}
+function getSortVal(item,key){
+  var v=SCALES[current].vals[item];
+  if(key==='cat1') return v[0];if(key==='cat2') return v[1];
+  if(key==='cat3') return v[2];if(key==='cat4') return v[3];
+  if(key==='cat12') return v[0]+v[1];if(key==='cat34') return v[2]+v[3];
+  return 0;
+}
+var tip=document.getElementById('tip');
+function showTip(e,item,ci,pct,easy,desc){
+  tip.style.opacity='1';
+  tip.innerHTML='<strong>'+item+'</strong><br><span style="color:#888;font-size:11px;">'+desc+'</span><br><br>'+
+    '<span style="color:'+C[ci]+';font-weight:600;">'+CLBL[ci]+': '+pct.toFixed(1)+'</span><br>'+
+    '<span style="color:#185FA5;font-size:11px;">'+TIP_EASY+' '+easy.toFixed(1)+'</span>';
+  moveTip(e);
+}
+function moveTip(e){
+  var tx=e.clientX+14,ty=e.clientY-10;
+  if(tx+270>window.innerWidth) tx=e.clientX-270;
+  if(ty<0) ty=e.clientY+20;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function hideTip(){tip.style.opacity='0';}
+function render(){
+  var sc=SCALES[current];
+  var items=sc.items.slice();
+  if(sortKey!=='orig'){
+    var dir=sortDir[sortKey]==='asc'?1:-1;
+    items.sort(function(a,b){return dir*(getSortVal(a,sortKey)-getSortVal(b,sortKey));});
+  }
+  var html='';
+  items.forEach(function(item){
+    var v=sc.vals[item],easy=v[2]+v[3];
+    var desc=sc.desc[item]||'';
+    html+='<div style="display:flex;align-items:center;margin-bottom:5px;" onmouseleave="hideTip()">';
+    html+='<div style="width:56px;text-align:right;padding-right:8px;font-size:11px;font-weight:700;color:#333;flex-shrink:0;">'+item+'</div>';
+    html+='<div style="flex:1;display:flex;height:30px;overflow:hidden;border-radius:3px;">';
+    v.forEach(function(pct,ci){
+      if(pct<0.2) return;
+      html+='<div style="width:'+pct+'%;background:'+C[ci]+';height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;"'+
+        ' onmouseenter="showTip(event,'+JSON.stringify(item)+','+ci+','+pct+','+easy+','+JSON.stringify(desc)+')"'+
+        ' onmousemove="moveTip(event)"'+
+        ' ontouchstart="tapSeg(event,'+JSON.stringify(item)+','+ci+','+pct+','+easy+','+JSON.stringify(desc)+')">';
+      if(pct>=2.5) html+='<span style="font-size:10px;color:#fff;pointer-events:none;">'+Math.round(pct)+'</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='<div style="width:38px;text-align:right;padding-left:5px;font-size:11px;font-weight:700;color:#185FA5;flex-shrink:0;">'+Math.round(easy)+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('chart').innerHTML=html;
+}
+function tapSeg(e,item,ci,pct,easy,desc){
+  e.preventDefault();
+  if(tip.style.opacity==='1'){hideTip();return;}
+  showTip(e.touches[0],item,ci,pct,easy,desc);
+}
+document.addEventListener('touchstart',function(e){
+  if(!e.target.closest('[onmouseleave]'))hideTip();
+},{passive:true});
+render();
+</script>
+</body>
+</html>
