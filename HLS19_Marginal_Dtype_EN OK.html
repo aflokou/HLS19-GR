@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLS19 Greek Versions — D-type (dichotomous) Score: Marginal Distribution</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:#f4f6f9; color:#222; }
+header { background:#042C53; color:#fff; padding:28px 40px 20px; }
+header h1 { font-size:22px; font-weight:600; margin-bottom:6px; }
+header p  { font-size:13px; color:#B5D4F4; }
+.container { max-width:1060px; margin:0 auto; padding:28px 32px; }
+.expl { background:#fff; border:1px solid #e0e5ec; border-radius:12px; padding:20px 24px; margin-bottom:22px; font-size:13px; color:#444; line-height:1.75; }
+.expl h2 { font-size:15px; font-weight:600; color:#042C53; margin-bottom:10px; }
+.expl p { margin-bottom:8px; }
+.expl p:last-child { margin-bottom:0; }
+.controls { background:#fff; border:1px solid #e0e5ec; border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.cl { font-size:11px; color:#888; white-space:nowrap; }
+.panel { background:#fff; border:1px solid #e0e5ec; border-radius:10px; padding:16px 18px; }
+.ptitle { font-size:13px; font-weight:600; margin-bottom:2px; }
+.psub   { font-size:11px; color:#999; margin-bottom:10px; line-height:1.5; }
+.stat-row { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.stat { background:#f4f7fb; border-radius:6px; padding:5px 8px; text-align:center; flex:1; min-width:52px; }
+.sv { font-size:13px; font-weight:600; color:#042C53; }
+.sl { font-size:9px; color:#aaa; margin-top:1px; }
+.pnote { font-size:10px; color:#555; margin-top:8px; padding:7px 10px; border-radius:6px; line-height:1.55; }
+footer { text-align:center; font-size:11px; color:#aaa; padding:20px 0 30px; }
+@media (max-width:660px) { header{padding:20px;} .container{padding:16px;} .controls{padding:12px 14px;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>HLS<sub>19</sub> Greek Versions &mdash; D-type (dichotomous) Score: Marginal Distribution</h1>
+  <p>How many binary response patterns yield each D-type score? &middot; NAV (2<sup>12</sup>) &middot; COM (2<sup>11</sup>) &middot; VAC (2<sup>4</sup>) &middot; Flokou et al., <em>Healthcare</em> 2025</p>
+</header>
+<div class="container">
+  <div class="expl">
+    <h2>What does this chart show?</h2>
+    <p>For each possible <strong>D-type score</strong>, the bar height shows <em>how many of all theoretical binary response patterns</em> produce that score. This is the marginal (unconditional) distribution of D-type scores across all 2<sup>k</sup> equally likely binary patterns.</p>
+    <p><strong>D-type</strong> scores are computed by recoding each item as 0 (rated 1 or 2 &mdash; &ldquo;difficult&rdquo;) or 1 (rated 3 or 4 &mdash; &ldquo;easy&rdquo;), then taking the percentage of &ldquo;easy&rdquo; items &times; 100. With k items there are 2<sup>k</sup> possible binary patterns and exactly k+1 distinct D-type values. The distribution follows a <strong>Binomial(k, 0.5)</strong> distribution &mdash; symmetric around 50.</p>
+    <p>For <em>odd</em> k (COM 11-item), D=50.0 is unreachable (would require exactly 5.5 &ldquo;easy&rdquo; items), so the peak <strong>splits symmetrically</strong> into D=45.5 and D=54.5 &mdash; a mathematical artefact, not real bimodality.</p>
+    <p>Use the <strong>Scale</strong> buttons to zoom into one scale at full width, and <strong>Y-axis</strong> to toggle between raw counts and percentages. Hover any bar for exact values.</p>
+  </div>
+
+  <div class="controls">
+    <span class="cl">Scale:</span>
+    <div id="scale-btns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <span class="cl" style="margin-left:10px;">Y-axis:</span>
+    <div id="y-btns" style="display:flex;gap:6px;"></div>
+  </div>
+
+  <div id="panels-wrap"></div>
+</div>
+<footer>HLS19 instruments &copy; HLS19 Consortium / WHO M-POHL &mdash; used with permission &middot; Greek adaptation: Flokou, Theodorou, Niakas, Kostagiolas (2025) &middot; doi:10.3390/healthcare13192541</footer>
+<div id="tip" style="position:fixed;background:#fff;border:1px solid #dde3ec;border-radius:8px;padding:9px 13px;font-size:12px;line-height:1.7;pointer-events:none;opacity:0;transition:opacity 0.1s;max-width:240px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:200;color:#333;"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var DATA={
+  "NAV":{"label":"HLS19-NAV-GR","n":12,"total":4096,"col":"#185FA5","colL":"#B5D4F4","n_vals":13,"peak_d":50.0,"peak_pct":22.5586,
+    "note":"12 items (even) \u2192 2\u00b9\u00b2 = 4,096 binary patterns. Single peak at D=50.0 (22.56%) \u2014 Binomial(12,\u00bd). Each bar = C(12,j) combinations.",
+    "rows":[[0.0,1,0.0244],[8.3,12,0.293],[16.7,66,1.6113],[25.0,220,5.3711],[33.3,495,12.085],[41.7,792,19.3359],[50.0,924,22.5586],[58.3,792,19.3359],[66.7,495,12.085],[75.0,220,5.3711],[83.3,66,1.6113],[91.7,12,0.293],[100.0,1,0.0244]]},
+  "COM":{"label":"HLS19-COM-GR","n":11,"total":2048,"col":"#0F6E56","colL":"#9FE1CB","n_vals":12,"peak_d":45.5,"peak_pct":22.5586,
+    "note":"11 items (odd) \u2192 2\u00b9\u00b9 = 2,048 binary patterns. D=50.0 is impossible. Peak splits into D=45.5 and D=54.5 (each 22.56%) \u2014 mathematical artefact of odd item count.",
+    "rows":[[0.0,1,0.0488],[9.1,11,0.5371],[18.2,55,2.6855],[27.3,165,8.0566],[36.4,330,16.1133],[45.5,462,22.5586],[54.5,462,22.5586],[63.6,330,16.1133],[72.7,165,8.0566],[81.8,55,2.6855],[90.9,11,0.5371],[100.0,1,0.0488]]},
+  "VAC":{"label":"HLS19-VAC-GR","n":4,"total":16,"col":"#BA7517","colL":"#FAC775","n_vals":5,"peak_d":50.0,"peak_pct":37.5,
+    "note":"4 items (even) \u2192 2\u2074 = 16 binary patterns. Single peak at D=50.0 (37.5%) \u2014 Binomial(4,\u00bd). Only 5 distinct D-type values.",
+    "rows":[[0.0,1,6.25],[25.0,4,25.0],[50.0,6,37.5],[75.0,4,25.0],[100.0,1,6.25]]}
+};
+var AXIS_LABEL="D-type score";
+var SCORE_TYPE="D-type";
+var curScale='all', curY='count';
+var charts={}, scaleBtns={}, yBtns={};
+
+var SCALE_DEFS=[
+  {key:'all',lbl:'All scales',ibg:'#fff',   ibd:'#042C53',itx:'#042C53',abg:'#042C53',abd:'#042C53',atx:'#fff'},
+  {key:'NAV',lbl:'NAV only',  ibg:'#EAF2FC',ibd:'#185FA5',itx:'#185FA5',abg:'#185FA5',abd:'#185FA5',atx:'#fff'},
+  {key:'COM',lbl:'COM only',  ibg:'#EAF8F4',ibd:'#0F6E56',itx:'#0F6E56',abg:'#0F6E56',abd:'#0F6E56',atx:'#fff'},
+  {key:'VAC',lbl:'VAC only',  ibg:'#FFF8EC',ibd:'#BA7517',itx:'#BA7517',abg:'#BA7517',abd:'#BA7517',atx:'#fff'}
+];
+var Y_DEFS=[
+  {key:'count',lbl:'Count',   ibg:'#fff',   ibd:'#042C53',itx:'#042C53',abg:'#042C53',abd:'#042C53',atx:'#fff'},
+  {key:'pct',  lbl:'Percent', ibg:'#f4f6f9',ibd:'#6B7A90',itx:'#6B7A90',abg:'#6B7A90',abd:'#6B7A90',atx:'#fff'}
+];
+
+function bSty(def,active){
+  var bg=active?def.abg:def.ibg,bd=active?def.abd:def.ibd,tx=active?def.atx:def.itx;
+  return 'padding:6px 14px;font-size:12px;border-radius:6px;border:1.5px solid '+bd+
+    ';cursor:pointer;background:'+bg+';color:'+tx+
+    ';font-family:inherit;touch-action:manipulation;font-weight:'+(active?'700':'500')+';min-height:34px;white-space:nowrap;';
+}
+
+(function(){
+  var sb=document.getElementById('scale-btns');
+  SCALE_DEFS.forEach(function(def){
+    var btn=document.createElement('button');
+    btn.style.cssText=bSty(def,def.key==='all');
+    btn.textContent=def.lbl;
+    btn.onclick=function(){setScale(def.key);};
+    sb.appendChild(btn); scaleBtns[def.key]=btn;
+  });
+  var yb=document.getElementById('y-btns');
+  Y_DEFS.forEach(function(def){
+    var btn=document.createElement('button');
+    btn.style.cssText=bSty(def,def.key==='count');
+    btn.textContent=def.lbl;
+    btn.onclick=function(){setY(def.key);};
+    yb.appendChild(btn); yBtns[def.key]=btn;
+  });
+})();
+
+function setScale(s){
+  curScale=s;
+  SCALE_DEFS.forEach(function(def){scaleBtns[def.key].style.cssText=bSty(def,def.key===s);scaleBtns[def.key].textContent=def.lbl;});
+  buildPanels();
+}
+function setY(y){
+  curY=y;
+  Y_DEFS.forEach(function(def){yBtns[def.key].style.cssText=bSty(def,def.key===y);yBtns[def.key].textContent=def.lbl;});
+  Object.keys(charts).forEach(function(k){updateChart(k);});
+}
+function visScales(){return curScale==='all'?['NAV','COM','VAC']:[curScale];}
+function destroyAll(){Object.keys(charts).forEach(function(k){charts[k].destroy();});charts={};}
+
+function updateChart(key){
+  var d=DATA[key],ch=charts[key]; if(!ch) return;
+  var isC=(curY==='count');
+  ch.data.datasets[0].data=d.rows.map(function(r){return isC?r[1]:r[2];});
+  ch.options.scales.y.title.text=isC?'Number of binary patterns':'% of all binary patterns';
+  ch.options.scales.y.ticks.callback=isC
+    ?function(v){return v;}
+    :function(v){return v.toFixed(1)+'%';};
+  ch.options.animation.duration=250; ch.update();
+}
+
+var tip=document.getElementById('tip');
+function showTip(e,key,idx){
+  var d=DATA[key],r=d.rows[idx];
+  tip.style.opacity='1';
+  tip.innerHTML='<strong>'+d.label+'</strong><br>'+
+    SCORE_TYPE+' = <strong>'+r[0].toFixed(1)+'</strong><br>'+
+    'Count: <strong>'+r[1].toLocaleString()+'</strong><br>'+
+    'Share: <strong>'+r[2].toFixed(4)+'%</strong> of 2<sup>'+d.n+'</sup>';
+  var tx=e.clientX+14,ty=e.clientY-10;
+  if(tx+245>window.innerWidth) tx=e.clientX-245;
+  if(ty<0) ty=e.clientY+20;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function hideTip(){tip.style.opacity='0';}
+
+function buildPanels(){
+  destroyAll();
+  var wrap=document.getElementById('panels-wrap');
+  var scales=visScales();
+  var cols=scales.length===1?'1fr':scales.length===2?'1fr 1fr':'1fr 1fr 1fr';
+  var h=scales.length===1?'340':'210';
+  wrap.innerHTML='';
+  var grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:'+cols+';gap:20px;';
+  wrap.appendChild(grid);
+
+  scales.forEach(function(key){
+    var d=DATA[key];
+    var maxCnt=Math.max.apply(null,d.rows.map(function(r){return r[1];}));
+    var peakRow=d.rows.reduce(function(a,b){return b[1]>a[1]?b:a;});
+
+    var panel=document.createElement('div');
+    panel.className='panel';
+    panel.innerHTML=
+      '<div class="ptitle" style="color:'+d.col+'">'+d.label+'</div>'+
+      '<div class="psub">'+d.n+' items &middot; 2<sup>'+d.n+'</sup> = '+d.total.toLocaleString()+' binary patterns &middot; '+d.n_vals+' '+SCORE_TYPE+' values</div>'+
+      '<div class="stat-row">'+
+        '<div class="stat"><div class="sv">'+d.n_vals+'</div><div class="sl">Distinct values</div></div>'+
+        '<div class="stat"><div class="sv">'+peakRow[2].toFixed(1)+'%</div><div class="sl">Peak %</div></div>'+
+        '<div class="stat"><div class="sv">'+peakRow[0].toFixed(1)+'</div><div class="sl">Peak score</div></div>'+
+      '</div>'+
+      '<div style="position:relative;height:'+h+'px;"><canvas id="hc-'+key+'"></canvas></div>'+
+      '<div class="pnote" style="background:'+d.col+'10;border-left:3px solid '+d.col+';">'+d.note+'</div>';
+    grid.appendChild(panel);
+
+    var labels=d.rows.map(function(r){return r[0].toFixed(1);});
+    var vals=d.rows.map(function(r){return r[1];});
+    var bgColors=d.rows.map(function(r){return r[1]===maxCnt?d.col:d.colL;});
+    var dpr=window.devicePixelRatio||1;
+
+    charts[key]=new Chart(document.getElementById('hc-'+key),{
+      type:'bar',
+      data:{labels:labels,datasets:[{
+        data:vals,backgroundColor:bgColors,borderColor:d.col,borderWidth:0.5,
+        hoverBackgroundColor:d.col,barPercentage:0.9,categoryPercentage:1.0
+      }]},
+      options:{
+        animation:{duration:0},responsive:true,maintainAspectRatio:false,
+        devicePixelRatio:dpr,
+        plugins:{legend:{display:false},tooltip:{enabled:false}},
+        onHover:function(e,els){
+          if(els.length>0){showTip(e.native||e,key,els[0].index);}
+          else{hideTip();}
+        },
+        scales:{
+          x:{ticks:{font:{size:9},maxRotation:0,color:'#aaa',autoSkip:false},
+             grid:{display:false},
+             title:{display:true,text:AXIS_LABEL,font:{size:9},color:'#777'}},
+          y:{ticks:{font:{size:8},color:'#aaa',
+               callback:function(v){return v;}},
+             grid:{color:'#f0f0f0'},
+             title:{display:true,text:'Number of binary patterns',font:{size:9},color:'#777'}}
+        }
+      }
+    });
+  });
+}
+
+buildPanels();
+window.addEventListener('resize',function(){
+  var dpr=window.devicePixelRatio||1;
+  Object.keys(charts).forEach(function(k){charts[k].options.devicePixelRatio=dpr;charts[k].resize();});
+});
+</script>
+</body>
+</html>
